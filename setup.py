@@ -3,7 +3,7 @@ __copyright__ = "Copyright (c) 2012 Michael Herold"
 __license__ = "BSD"
 
 from setuptools import setup, find_packages
-from common.version import version
+from pyisemail.common.version import version
 
 setup(
     name = "pyIsEmail",
@@ -30,12 +30,14 @@ setup(
     include_package_data = True,
     exclude_package_data = {
         '': ['.gitignore', '.venv']
-    }
+    },
     zip_safe = False,
     install_requires = [
         # -*- Extra requirements: -*-
     ],
-    setup_requires = ["setuptool_git >= 0.4.2",]
+    setup_requires = ["setuptools-git >= 0.4.2"],
+    tests_require = ["testscenarios >= 0.3"],
+    test_suite = "pyisemail.test",
     entry_points = """
     # -*- Entry points: -*-
     """
