@@ -1,9 +1,0 @@
-setup.cfg
-setup.py
-pyIsEmail.egg-info/PKG-INFO
-pyIsEmail.egg-info/SOURCES.txt
-pyIsEmail.egg-info/dependency_links.txt
-pyIsEmail.egg-info/entry_points.txt
-pyIsEmail.egg-info/not-zip-safe
-pyIsEmail.egg-info/top_level.txt
-pyisemail/__init__.py
