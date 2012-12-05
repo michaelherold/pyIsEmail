@@ -116,6 +116,12 @@ E_WARNING = 2
 
 DEBUG = False
 
+def _unicode_help(token):
+    if ord(token) in range(9216, 9229+1):
+        token = unichr(ord(token) - 9216)
+    
+    return token
+
 def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     # Check that $email is a valid address. Read the following RFCs to
     # understand the constraints:
@@ -160,15 +166,28 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     element_len = 0
     hyphen_flag = False         # Hyphen cannot occur at the end of a subdomain
     end_or_die = False          # CFWS can only appear at the end of an element
+    skip = False                # Skip flag that simulates i++
+    crlf_count = -1             # crlf_count = -1 == !isset(crlf_count)
 
     if DEBUG:
         print "con\tend\ttok\tret\tcon\tend\ttok\tret\tpar\t\tat"
 
     for i in xrange(raw_length):
+    
+        # Skip simulates the use of ++ operator
+        if skip:
+            skip = False
+            continue
+            
         token = email[i]
+        
+        # NoteMJH: Since PHP casts the symbols for ASCII control
+        #    characters down to the actual ASCII control characters, we
+        #    must do this so ensure it works the same way
+        token = _unicode_help(token)
 
         if DEBUG:
-            print u"%i\t%s\t%s\t%i\t" % (context, end_or_die, token, max(return_status)),
+            print u"%i\t%s\t%s\t%i\t" % (context, end_or_die, ord(token), max(return_status)),
         
         # Switch to simulate decrementing; needed for FWS
         repeat = True
@@ -256,8 +275,16 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
+                    
+                    # TODO: Clean this up!
+                    # Skip simulates the use of ++ operator if the latter check
+                    # doesn't short-circuit
+                    if token == ISEMAIL_STRING_CR:
+                        skip = True
+
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or 
-                        email[i+1] != ISEMAIL_STRING_LF)):
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
+                        
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -472,8 +499,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
+                    
+                    # TODO: Clean this up!
+                    # Skip simulates the use of ++ operator if the latter check
+                    # doesn't short-circuit
+                    if token == ISEMAIL_STRING_CR:
+                        skip = True
+                    
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        email[i+1] != ISEMAIL_STRING_LF)):
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -638,13 +672,13 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         )
                         matchesIP = re.search(regex, addressLiteral)
                         if matchesIP:
-                            index = matchesIP.group(0).find(addressLiteral)
+                            index = addressLiteral.rfind(matchesIP.group(0))
                             if index != 0:
                                 # Convert IPv4 part to IPv6 format for further 
                                 # testing
                                 addressLiteral = addressLiteral[0:index] + '0:0'
                         
-                        if index == 0:
+                        if index == 0 and index is not False:
                             # Nothing there except a valid IPv4 address, so ...
                             return_status.append(ISEMAIL_RFC5321_ADDRESSLITERAL)
                         elif not addressLiteral.startswith(ISEMAIL_STRING_IPV6TAG):
@@ -663,7 +697,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                     return_status.append(
                                         ISEMAIL_RFC5322_IPV6_GRPCOUNT
                                     )
-                            else:
+                            else:                                
                                 if index != IPv6.rfind(ISEMAIL_STRING_DOUBLECOLON):
                                     return_status.append(
                                         ISEMAIL_RFC5322_IPV6_2X2XCOLON
@@ -675,15 +709,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                         # in addition
                                         max_groups += 1
                                         
-                                        if groupCount > max_groups:
-                                            return_status.append(
-                                                ISEMAIL_RFC5322_IPV6_MAXGRPS
-                                            )
-                                        elif groupCount == max_groups:
-                                            # Eliding a single "::"
-                                            return_status.append(
-                                                ISEMAIL_RFC5321_IPV6DEPRECATED
-                                            )
+                                    if groupCount > max_groups:
+                                        return_status.append(
+                                            ISEMAIL_RFC5322_IPV6_MAXGRPS
+                                        )
+                                    elif groupCount == max_groups:
+                                        # Eliding a single "::"
+                                        return_status.append(
+                                            ISEMAIL_RFC5321_IPV6DEPRECATED
+                                        )
                             
                             # Revision 2.7: Daniel Marschall's new IPv6 testing
                             # strategy
@@ -695,7 +729,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                   IPv6[-2] != ISEMAIL_STRING_COLON):
                                 # Address ends with a single colon
                                 return_status.append(ISEMAIL_RFC5322_IPV6_COLONEND)
-                            elif ([re.match(r"^[^0-9A-Fa-f]{0,4}$", i)
+                            elif ([re.match(r"^[0-9A-Fa-f]{0,4}$", i)
                                   for i in matchesIP].count(None) != 0):
                                 # Check for unmatched characters
                                 return_status.append(ISEMAIL_RFC5322_IPV6_BADCHAR)
@@ -716,8 +750,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
+                    
+                    # TODO: Clean this up!
+                    # Skip simulates the use of ++ operator if the latter check
+                    # doesn't short-circuit
+                    if token == ISEMAIL_STRING_CR:
+                        skip = True
+                    
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        email[i+1] != ISEMAIL_STRING_LF)):
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -776,8 +817,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Inside a quoted string, spaces are allow as regular
                 # characters. It's only FWS if we include HTAB or CRLF
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_HTAB]:
+                    
+                    # TODO: Clean this up!
+                    # Skip simulates the use of ++ operator if the latter check
+                    # doesn't short-circuit
+                    if token == ISEMAIL_STRING_CR:
+                        skip = True
+                
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        email[i+1] != ISEMAIL_STRING_LF)):
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -824,8 +872,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     #                     %d127       ;  white space characters
                     o = ord(token)
                     
-                    # NoteMJH: Changed o == 0 to o == 9216
-                    if o > 127 or o == 9216 or o == 10:
+                    if o > 127 or o == 0 or o == 10:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_QTEXT)
                     elif o < 32 or o == 127:
@@ -947,8 +994,16 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
+                    
+                    # TODO: Clean this up!
+                    # Skip simulates the use of ++ operator if the latter check
+                    # doesn't short-circuit
+                    if token == ISEMAIL_STRING_CR:
+                        skip = True
+                    
                     if token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        email[i+1] != ISEMAIL_STRING_LF):
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF):
+                        
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -1005,24 +1060,28 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #
                 #   obs-FWS         =   1*([CRLF] WSP)
                 
-                crlf_count = -1
-                
                 if token_prior == ISEMAIL_STRING_CR:
                     if token == ISEMAIL_STRING_CR:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_FWS_CRLF_X2)
                         break
                     
-                    if crlf_count > -1:
+                    if crlf_count != -1:
                         crlf_count += 1
                         if crlf_count > 1:
                             # Multiple folds = obsolete FWS
                             return_status.append(ISEMAIL_DEPREC_FWS)
-                        else:
-                            crlf_count = 1
+                    else:
+                        crlf_count = 1
                 
                 if token == ISEMAIL_STRING_CR:
-                    if i+1 == raw_length or email[i+1] != ISEMAIL_STRING_LF:
+                    
+                    # Skip simulates the use of ++ operator
+                    skip = True
+                
+                    if (i+1 == raw_length or
+                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF):
+                                                
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                 elif token in [ISEMAIL_STRING_SP, ISEMAIL_STRING_HTAB]:
@@ -1067,8 +1126,8 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
             else:
                 SystemExit("Unknown context: %s" % context)
                 
-            if DEBUG:
-                print u"%i\t%s\t%s\t%i\t%s\t%s" % (context, end_or_die, token, max(return_status), str(parseData), str(atomList))
+        if DEBUG:
+            print u"%i\t%s\t%s\t%i\t%s" % (context, end_or_die, ord(token), max(return_status), str(parseData))
 
         # No point in going on if we've got a fatal error
         if max(return_status) > ISEMAIL_RFC5322:
@@ -1178,7 +1237,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 result = dns.resolver.query(parseData[ISEMAIL_COMPONENT_DOMAIN])
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
-                return_status.append(ISEMAIL_DNS_WARN_NO_RECORD)
+                return_status.append(ISEMAIL_DNSWARN_NO_RECORD)
             
     # Check for TLD addresses
 	# -----------------------
