@@ -117,12 +117,37 @@ E_WARNING = 2
 DEBUG = False
 
 def _unicode_help(token):
+    """Transforms the ASCII control character symbols to their real character.
+    
+    Note: If the token is not an ASCII control character symbol, just return
+    the token.
+    
+    Keyword arguments:
+    token -- the token to transform
+    
+    """
     if ord(token) in range(9216, 9229+1):
         token = unichr(ord(token) - 9216)
     
     return token
 
 def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
+    """Check that an email address conforms to RFCs 5321, 5322 and others
+
+    As of Version 3.0, we are now distinguishing clearly between a Mailbox
+    as defined by RFC 5321 and an addr-spec as defined by RFC 5322. Depending
+    on the context, either can be regarded as a valid email address. The
+    RFC 5321 Mailbox specification is more restrictive (comments, white space
+    and obsolete forms are not allowed)
+    
+    Keyword arguments:
+    email	   -- email address to check.
+    checkDNS   -- flag to do a DNS check for MX records
+    errorLevel -- the status code below which the email is valid 
+    parseData  -- If passed, returns the parsed address components
+    
+    """
+
     # Check that $email is a valid address. Read the following RFCs to
     # understand the constraints:
 	# 	(http://tools.ietf.org/html/rfc5321)
@@ -133,7 +158,6 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     # version 2.0: Enhance $diagnose parameter to $errorlevel
     # version 3.0: Introduced status categories
     # revision 3.1: BUG: $parsedata was passed by value instead of by reference
-    
     if isinstance(errorLevel, bool):
         threshold = ISEMAIL_VALID
         diagnose = errorLevel
