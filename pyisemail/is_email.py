@@ -116,6 +116,7 @@ E_WARNING = 2
 
 DEBUG = False
 
+
 def _unicode_help(token):
     """Transforms the ASCII control character symbols to their real character.
 
@@ -131,7 +132,8 @@ def _unicode_help(token):
 
     return token
 
-def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
+
+def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
     """Check that an email address conforms to RFCs 5321, 5322 and others
 
     As of Version 3.0, we are now distinguishing clearly between a Mailbox
@@ -141,7 +143,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     and obsolete forms are not allowed)
 
     Keyword arguments:
-    email	   -- email address to check.
+    email      -- email address to check.
     checkDNS   -- flag to do a DNS check for MX records
     errorLevel -- the status code below which the email is valid
     parseData  -- If passed, returns the parsed address components
@@ -150,11 +152,11 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
     # Check that $email is a valid address. Read the following RFCs to
     # understand the constraints:
-	# 	(http://tools.ietf.org/html/rfc5321)
-	# 	(http://tools.ietf.org/html/rfc5322)
-	# 	(http://tools.ietf.org/html/rfc4291#section-2.2)
-	# 	(http://tools.ietf.org/html/rfc1123#section-2.1)
-	# 	(http://tools.ietf.org/html/rfc3696) (guidance only)
+    #   (http://tools.ietf.org/html/rfc5321)
+    #   (http://tools.ietf.org/html/rfc5322)
+    #   (http://tools.ietf.org/html/rfc4291#section-2.2)
+    #   (http://tools.ietf.org/html/rfc1123#section-2.1)
+    #   (http://tools.ietf.org/html/rfc3696) (guidance only)
     # version 2.0: Enhance $diagnose parameter to $errorlevel
     # version 3.0: Introduced status categories
     # revision 3.1: BUG: $parsedata was passed by value instead of by reference
@@ -165,9 +167,9 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         diagnose = True
 
     if errorLevel == E_WARNING:
-        threshold = ISEMAIL_THRESHOLD # For backward compatibility
+        threshold = ISEMAIL_THRESHOLD  # For backward compatibility
     elif errorLevel == E_ERROR:
-        threshold = ISEMAIL_VALID # For backward compatibility
+        threshold = ISEMAIL_VALID      # For backward compatibility
     else:
         threshold = errorLevel
 
@@ -183,8 +185,8 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     parseData[ISEMAIL_COMPONENT_LOCALPART] = ''     # The address' components
     parseData[ISEMAIL_COMPONENT_DOMAIN] = ''
     atomList = {
-        ISEMAIL_COMPONENT_LOCALPART : [''],
-        ISEMAIL_COMPONENT_DOMAIN : ['']
+        ISEMAIL_COMPONENT_LOCALPART: [''],
+        ISEMAIL_COMPONENT_DOMAIN: ['']
     }                                               # The address' dot-atoms
     element_count = 0
     element_len = 0
@@ -211,7 +213,10 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         token = _unicode_help(token)
 
         if DEBUG:
-            print u"%i\t%s\t%s\t%i\t" % (context, end_or_die, ord(token), max(return_status)),
+            print u"%i\t%s\t%s\t%i\t" % (context,
+                                         end_or_die,
+                                         ord(token),
+                                         max(return_status)),
 
         # Switch to simulate decrementing; needed for FWS
         repeat = True
@@ -298,7 +303,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         return_status.append(ISEMAIL_ERR_EXPECTING_ATEXT)
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
-                    ISEMAIL_STRING_HTAB]:
+                               ISEMAIL_STRING_HTAB]:
 
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
@@ -306,8 +311,9 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     if token == ISEMAIL_STRING_CR:
                         skip = True
 
-                    if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
+                    if (token == ISEMAIL_STRING_CR and
+                        (i+1 == raw_length or
+                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
 
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
@@ -356,7 +362,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     #    carefully weighed before implementing any behavior
                     #    described with this label.
                     elif context_prior in [ISEMAIL_CONTEXT_COMMENT,
-                        ISEMAIL_CONTEXT_FWS]:
+                                           ISEMAIL_CONTEXT_FWS]:
                         return_status.append(ISEMAIL_DEPREC_CFWS_NEAR_AT)
 
                     # Clear everything down for the domain parsing
@@ -383,7 +389,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     if end_or_die:
                         # We have encountered atext where it is no longer valid
                         if context_prior in [ISEMAIL_CONTEXT_COMMENT,
-                            ISEMAIL_CONTEXT_FWS]:
+                                             ISEMAIL_CONTEXT_FWS]:
                             return_status.append(ISEMAIL_ERR_ATEXT_AFTER_CFWS)
                         elif context_prior == ISEMAIL_CONTEXT_QUOTEDSTRING:
                             return_status.append(ISEMAIL_ERR_ATEXT_AFTER_QS)
@@ -396,9 +402,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         context_prior = context
                         o = ord(token)
 
-                        if (o < 33 or o > 126 or o == 10 or
-                            token in ISEMAIL_STRING_SPECIALS):
-                            # Fatal error
+                        if (o < 33 or o > 126 or o == 10 or token in ISEMAIL_STRING_SPECIALS):
                             return_status.append(ISEMAIL_ERR_EXPECTING_ATEXT)
 
                         parseData[ISEMAIL_COMPONENT_LOCALPART] += token
@@ -461,7 +465,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         if element_count == 0:
                             return_status.append(ISEMAIL_DEPREC_CFWS_NEAR_AT)
                         else:
-                            return_status.append(ISEMAIL_DPREC_COMMENT)
+                            return_status.append(ISEMAIL_DEPREC_COMMENT)
                     else:
                         return_status.append(ISEMAIL_CFWS_COMMENT)
                         # We can't start a comment in the middle of an element,
@@ -522,7 +526,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
-                    ISEMAIL_STRING_HTAB]:
+                               ISEMAIL_STRING_HTAB]:
 
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
@@ -530,8 +534,9 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     if token == ISEMAIL_STRING_CR:
                         skip = True
 
-                    if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
-                        _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
+                    if (token == ISEMAIL_STRING_CR and
+                        (i+1 == raw_length or
+                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
@@ -578,7 +583,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     if end_or_die:
                         # We have encountered atext where it is no longer valid
                         if context_prior in [ISEMAIL_CONTEXT_COMMENT,
-                            ISEMAIL_CONTEXT_FWS]:
+                                             ISEMAIL_CONTEXT_FWS]:
                             return_status.append(ISEMAIL_ERR_ATEXT_AFTER_CFWS)
                         elif context_prior == ISEMAIL_COMPONENT_LITERAL:
                             return_status.append(ISEMAIL_ERR_ATEXT_AFTER_DOMLIT)
@@ -588,13 +593,11 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                  "unrecognised prior context: %s" %
                                  context_prior))
 
-
                     o = ord(token)
                     # Assume this token isn't a hyphen unless we discover it is
                     hyphen_flag = False
 
-                    if (o < 33 or o > 126 or
-                        token in ISEMAIL_STRING_SPECIALS):
+                    if (o < 33 or o > 126 or token in ISEMAIL_STRING_SPECIALS):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_ATEXT)
                     elif token == ISEMAIL_STRING_HYPHEN:
@@ -605,8 +608,8 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
                         hyphen_flag = True
                     elif not ((o > 47 and o < 58) or
-                        (o > 64 and o < 91) or
-                        (o > 96 and o < 123)):
+                              (o > 64 and o < 91) or
+                              (o > 96 and o < 123)):
                         # Not an RFC 5321 subdomain, but still OK by RFC 5322
                         return_status.append(ISEMAIL_RFC5322_DOMAIN)
 
@@ -618,13 +621,13 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
             #--------------------------------------------------------
             elif context == ISEMAIL_COMPONENT_LITERAL:
                 # http://tools.ietf.org/html/rfc5322#section-3.4.1
-                #   domain-literal  =   [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+                #   domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
                 #
-                #   dtext           =   %d33-90 /     ; Printable US-ASCII
-                #                       %d94-126 /    ;  characters not including
-                #                       obs-dtext     ;  "[", "]", or "\"
+                #   dtext          = %d33-90 /     ; Printable US-ASCII
+                #                    %d94-126 /    ;  characters not including
+                #                    obs-dtext     ;  "[", "]", or "\"
                 #
-                #   obs-dtext       =   obs-NO-WS-CTL / quoted-pair
+                #   obs-dtext      = obs-NO-WS-CTL / quoted-pair
 
                 # End of domain literal
                 if token == ISEMAIL_STRING_CLOSESQBRACKET:
@@ -700,7 +703,8 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                             if index != 0:
                                 # Convert IPv4 part to IPv6 format for further
                                 # testing
-                                addressLiteral = addressLiteral[0:index] + '0:0'
+                                addressLiteral = addressLiteral[0:index] + \
+                                    '0:0'
 
                         if index == 0 and index is not False:
                             # Nothing there except a valid IPv4 address, so ...
@@ -773,7 +777,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     context = ISEMAIL_CONTEXT_QUOTEDPAIR
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
-                    ISEMAIL_STRING_HTAB]:
+                               ISEMAIL_STRING_HTAB]:
 
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
@@ -816,7 +820,6 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         break
                     elif o < 33 or o == 127:
                         return_status.append(ISEMAIL_RFC5322_DOMLIT_OBSDTEXT)
-
 
                     parseData[ISEMAIL_COMPONENT_LITERAL] += token
                     parseData[ISEMAIL_COMPONENT_DOMAIN] += token
@@ -878,7 +881,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     atomList[ISEMAIL_COMPONENT_LOCALPART][element_count] += token
                     element_len += 1
                     context_prior = context
-                    context	= context_stack.pop()
+                    context = context_stack.pop()
                 # qtext
                 else:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.4
@@ -1017,7 +1020,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     context = ISEMAIL_CONTEXT_QUOTEDPAIR
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
-                    ISEMAIL_STRING_HTAB]:
+                               ISEMAIL_STRING_HTAB]:
 
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
@@ -1064,7 +1067,6 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     elif o < 32 or o == 127:
                         return_status.append(ISEMAIL_DEPREC_CTEXT)
 
-
             #--------------------------------------------------------
             # Folding White Space (FWS)
             #--------------------------------------------------------
@@ -1074,7 +1076,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #                       ; Folding white space
                 #
                 # But note the erratum:
-                # http://www.rfc-editor.org/errata_search.php?rfc=5322&eid=1908:
+                # http://www.rfc-editor.org/errata_search.php?rfc=5322&eid=1908
                 #   In the obsolete syntax, any amount of folding white space
                 #   MAY be inserted where the obs-FWS rule is allowed.  This
                 #   creates the possibility of having two consecutive "folds"
@@ -1151,13 +1153,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 SystemExit("Unknown context: %s" % context)
 
         if DEBUG:
-            print u"%i\t%s\t%s\t%i\t%s" % (context, end_or_die, ord(token), max(return_status), str(parseData))
+            print u"%i\t%s\t%s\t%i\t%s" % (context,
+                                           end_or_die,
+                                           ord(token),
+                                           max(return_status),
+                                           str(parseData))
 
         # No point in going on if we've got a fatal error
         if max(return_status) > ISEMAIL_RFC5322:
             break
-
-
 
     # Some simple final tests
     if max(return_status) < ISEMAIL_RFC5322:
@@ -1186,25 +1190,25 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
             # Fatal error
             return_status.append(ISEMAIL_ERR_DOMAINHYPHENEND)
         # http://tools.ietf.org/html/rfc5321#section-4.5.3.1.2
-		#   The maximum total length of a domain name or number is 255 octets.
+        #   The maximum total length of a domain name or number is 255 octets.
         elif len(parseData[ISEMAIL_COMPONENT_DOMAIN]) > 255:
             return_status.append(ISEMAIL_RFC5322_DOMAIN_TOOLONG)
         # http://tools.ietf.org/html/rfc5321#section-4.1.2
-		#   Forward-path   = Path
-		#
-		#   Path           = "<" [ A-d-l ":" ] Mailbox ">"
-		#
-		# http://tools.ietf.org/html/rfc5321#section-4.5.3.1.3
-		#   The maximum total length of a reverse-path or forward-path is 256
-		#   octets (including the punctuation and element separators).
-		#
-		# Thus, even without (obsolete) routing information, the Mailbox can
-		# only be 254 characters long. This is confirmed by this verified
-		# erratum to RFC 3696:
-		#
-		# http://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1690
-		#   However, there is a restriction in RFC 2821 on the length of an
-		#   address in MAIL and RCPT commands of 254 characters.  Since
+        #   Forward-path   = Path
+        #
+        #   Path           = "<" [ A-d-l ":" ] Mailbox ">"
+        #
+        # http://tools.ietf.org/html/rfc5321#section-4.5.3.1.3
+        #   The maximum total length of a reverse-path or forward-path is 256
+        #   octets (including the punctuation and element separators).
+        #
+        # Thus, even without (obsolete) routing information, the Mailbox can
+        # only be 254 characters long. This is confirmed by this verified
+        # erratum to RFC 3696:
+        #
+        # http://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1690
+        #   However, there is a restriction in RFC 2821 on the length of an
+        #   address in MAIL and RCPT commands of 254 characters.  Since
         #   addresses that do not fit in those fields are not normally useful,
         #   the upper limit on address lengths should normally be considered to
         #   be 254.
@@ -1212,7 +1216,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                  parseData[ISEMAIL_COMPONENT_DOMAIN]) > 254:
             return_status.append(ISEMAIL_RFC5322_TOOLONG)
         # http://tools.ietf.org/html/rfc1035#section-2.3.4
-		# labels           63 octets or less
+        # labels           63 octets or less
         elif element_len > 63:
             return_status.append(ISEMAIL_RFC5322_LABEL_TOOLONG)
 
@@ -1221,20 +1225,20 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
     if checkDNS and max(return_status) < ISEMAIL_DNSWARN:
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
-		#   Names that can
-		#   be resolved to MX RRs or address (i.e., A or AAAA) RRs (as
+        #   Names that can
+        #   be resolved to MX RRs or address (i.e., A or AAAA) RRs (as
         #   discussed in Section 5) are permitted, as are CNAME RRs whose
         #   targets can be resolved, in turn, to MX or address RRs.
-		#
-		# http://tools.ietf.org/html/rfc5321#section-5.1
-		#   The lookup first attempts to locate an MX record associated with
+        #
+        # http://tools.ietf.org/html/rfc5321#section-5.1
+        #   The lookup first attempts to locate an MX record associated with
         #   the name.  If a CNAME record is found, the resulting name is
         #   processed as if it were the initial name. ... If an empty list of
         #   MXs is returned, the address is treated as if it was associated
         #   with an implicit MX RR, with a preference of 0, pointing to that
         #   host.
-		#
-		# is_email() author's note: We will regard the existence of a CNAME to
+        #
+        # is_email() author's note: We will regard the existence of a CNAME to
         # be sufficient evidence of the domain's existence. For performance
         # reasons we will not repeat the DNS lookup for the CNAME's target, but
         # we will raise a warning because we didn't immediately find an MX
@@ -1247,7 +1251,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
         try:
             result = dns.resolver.query(parseData[ISEMAIL_COMPONENT_DOMAIN],
-                'MX')
+                                        'MX')
             dns_checked = True
         except dns.resolver.NXDOMAIN:
             # Domain can't be found in DNS
@@ -1264,37 +1268,37 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 return_status.append(ISEMAIL_DNSWARN_NO_RECORD)
 
     # Check for TLD addresses
-	# -----------------------
-	# TLD addresses are specifically allowed in RFC 5321 but they are
-	# unusual to say the least. We will allocate a separate
-	# status to these addresses on the basis that they are more likely
-	# to be typos than genuine addresses (unless we've already
-	# established that the domain does have an MX record)
-	#
-	# http://tools.ietf.org/html/rfc5321#section-2.3.5
-	#   In the case
-	#   of a top-level domain used by itself in an email address, a single
-	#   string is used without any dots.  This makes the requirement,
-	#   described in more detail below, that only fully-qualified domain
-	#   names appear in SMTP transactions on the public Internet,
-	#   particularly important where top-level domains are involved.
-	#
-	# TLD format
-	# ----------
-	# The format of TLDs has changed a number of times. The standards
-	# used by IANA have been largely ignored by ICANN, leading to
-	# confusion over the standards being followed. These are not defined
-	# anywhere, except as a general component of a DNS host name (a label).
-	# However, this could potentially lead to 123.123.123.123 being a
-	# valid DNS name (rather than an IP address) and thereby creating
-	# an ambiguity. The most authoritative statement on TLD formats that
-	# the author can find is in a (rejected!) erratum to RFC 1123
-	# submitted by John Klensin, the author of RFC 5321:
-	#
-	# http://www.rfc-editor.org/errata_search.php?rfc=1123&eid=1353
-	#   However, a valid host name can never have the dotted-decimal
-	#   form #.#.#.#, since this change does not permit the highest-level
-	#   component label to start with a digit even if it is not all-numeric.
+    # -----------------------
+    # TLD addresses are specifically allowed in RFC 5321 but they are
+    # unusual to say the least. We will allocate a separate
+    # status to these addresses on the basis that they are more likely
+    # to be typos than genuine addresses (unless we've already
+    # established that the domain does have an MX record)
+    #
+    # http://tools.ietf.org/html/rfc5321#section-2.3.5
+    #   In the case
+    #   of a top-level domain used by itself in an email address, a single
+    #   string is used without any dots.  This makes the requirement,
+    #   described in more detail below, that only fully-qualified domain
+    #   names appear in SMTP transactions on the public Internet,
+    #   particularly important where top-level domains are involved.
+    #
+    # TLD format
+    # ----------
+    # The format of TLDs has changed a number of times. The standards
+    # used by IANA have been largely ignored by ICANN, leading to
+    # confusion over the standards being followed. These are not defined
+    # anywhere, except as a general component of a DNS host name (a label).
+    # However, this could potentially lead to 123.123.123.123 being a
+    # valid DNS name (rather than an IP address) and thereby creating
+    # an ambiguity. The most authoritative statement on TLD formats that
+    # the author can find is in a (rejected!) erratum to RFC 1123
+    # submitted by John Klensin, the author of RFC 5321:
+    #
+    # http://www.rfc-editor.org/errata_search.php?rfc=1123&eid=1353
+    #   However, a valid host name can never have the dotted-decimal
+    #   form #.#.#.#, since this change does not permit the highest-level
+    #   component label to start with a digit even if it is not all-numeric.
 
     if not dns_checked and max(return_status) < ISEMAIL_DNSWARN:
         if element_count == 0:

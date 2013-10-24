@@ -2,7 +2,6 @@ __author__ = "Michael Herold"
 __copyright__ = "Copyright (c) 2013 Michael Herold"
 __license__ = "MIT"
 
-import unittest
 import xml.etree.ElementTree as ET
 from pyisemail.is_email import is_email
 from testscenarios import TestWithScenarios
@@ -113,6 +112,7 @@ ISEMAIL_STRING_IPV6TAG = 'IPv6:'
 # (http:#tools.ietf.org/html/rfc5322#section-3.2.3)
 ISEMAIL_STRING_SPECIALS = '()<>[]:;@\\,."'
 
+
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
 
@@ -137,6 +137,7 @@ def get_scenarios():
         scenarios.append(scenario)
 
     return scenarios
+
 
 def get_node_text(text):
 
@@ -165,4 +166,3 @@ class ParseTestCase(TestWithScenarios):
             ("%s (%s): Got %s, but expected %s. (%s)"
              % (self.id, self.address, result, diagnosis, str(p)))
         )
-
