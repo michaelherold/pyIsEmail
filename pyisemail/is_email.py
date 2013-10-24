@@ -1,6 +1,6 @@
 __author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2012 Michael Herold"
-__license__ = "BSD"
+__copyright__ = "Copyright (c) 2013 Michael Herold"
+__license__ = "MIT"
 
 import re
 import dns.resolver
@@ -107,7 +107,7 @@ ISEMAIL_STRING_HTAB = "\t"
 ISEMAIL_STRING_CR = "\r"
 ISEMAIL_STRING_LF = "\n"
 ISEMAIL_STRING_IPV6TAG = 'IPv6:'
-# US-ASCII visible characters not valid for atext 
+# US-ASCII visible characters not valid for atext
 # (http:#tools.ietf.org/html/rfc5322#section-3.2.3)
 ISEMAIL_STRING_SPECIALS = '()<>[]:;@\\,."'
 
@@ -118,17 +118,17 @@ DEBUG = False
 
 def _unicode_help(token):
     """Transforms the ASCII control character symbols to their real character.
-    
+
     Note: If the token is not an ASCII control character symbol, just return
     the token.
-    
+
     Keyword arguments:
     token -- the token to transform
-    
+
     """
     if ord(token) in range(9216, 9229+1):
         token = unichr(ord(token) - 9216)
-    
+
     return token
 
 def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
@@ -139,13 +139,13 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
     on the context, either can be regarded as a valid email address. The
     RFC 5321 Mailbox specification is more restrictive (comments, white space
     and obsolete forms are not allowed)
-    
+
     Keyword arguments:
     email	   -- email address to check.
     checkDNS   -- flag to do a DNS check for MX records
-    errorLevel -- the status code below which the email is valid 
+    errorLevel -- the status code below which the email is valid
     parseData  -- If passed, returns the parsed address components
-    
+
     """
 
     # Check that $email is a valid address. Read the following RFCs to
@@ -163,25 +163,25 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         diagnose = errorLevel
     else:
         diagnose = True
-        
+
     if errorLevel == E_WARNING:
         threshold = ISEMAIL_THRESHOLD # For backward compatibility
     elif errorLevel == E_ERROR:
         threshold = ISEMAIL_VALID # For backward compatibility
     else:
         threshold = errorLevel
-        
+
     return_status = [ISEMAIL_VALID]
-    
+
     # Parse the address into components, character by character
     raw_length = len(email)
     context = ISEMAIL_COMPONENT_LOCALPART           # Where we are
     context_stack = [context]                       # Where we've been
-    context_prior = ISEMAIL_COMPONENT_LOCALPART     # Where we just came from    
+    context_prior = ISEMAIL_COMPONENT_LOCALPART     # Where we just came from
     token = ''                                      # The current character
     token_prior = ''                                # The previous character
     parseData[ISEMAIL_COMPONENT_LOCALPART] = ''     # The address' components
-    parseData[ISEMAIL_COMPONENT_DOMAIN] = ''                                  
+    parseData[ISEMAIL_COMPONENT_DOMAIN] = ''
     atomList = {
         ISEMAIL_COMPONENT_LOCALPART : [''],
         ISEMAIL_COMPONENT_DOMAIN : ['']
@@ -197,14 +197,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         print "con\tend\ttok\tret\tcon\tend\ttok\tret\tpar\t\tat"
 
     for i in xrange(raw_length):
-    
+
         # Skip simulates the use of ++ operator
         if skip:
             skip = False
             continue
-            
+
         token = email[i]
-        
+
         # NoteMJH: Since PHP casts the symbols for ASCII control
         #    characters down to the actual ASCII control characters, we
         #    must do this so ensure it works the same way
@@ -212,13 +212,13 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 
         if DEBUG:
             print u"%i\t%s\t%s\t%i\t" % (context, end_or_die, ord(token), max(return_status)),
-        
+
         # Switch to simulate decrementing; needed for FWS
         repeat = True
-        
+
         while repeat:
             repeat = False
-        
+
             #--------------------------------------------------------
             # Local part
             #--------------------------------------------------------
@@ -252,7 +252,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # We can't start a comment in the middle of an element,
                         # so this better be the end
                         end_or_die = True
-                    
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_COMMENT
                 elif token == ISEMAIL_STRING_DOT:
@@ -268,7 +268,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # an RFC 5322 obsolete form
                         if end_or_die:
                             return_status.append(ISEMAIL_DEPREC_LOCALPART)
-                        
+
                         # CFWS & quoted strings are OK again now we're at the
                         # beginning of an element (although they are obsolete
                         # forms)
@@ -286,7 +286,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                             return_status.append(ISEMAIL_RFC5321_QUOTEDSTRING)
                         else:
                             return_status.append(ISEMAIL_DEPREC_LOCALPART)
-                            
+
                         parseData[ISEMAIL_COMPONENT_LOCALPART] += token
                         atomList[ISEMAIL_COMPONENT_LOCALPART][element_count] += token
                         element_len += 1
@@ -299,20 +299,20 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
-                    
+
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
                     # doesn't short-circuit
                     if token == ISEMAIL_STRING_CR:
                         skip = True
 
-                    if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or 
+                    if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
-                        
+
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
-                    
+
                     if element_len == 0:
                         if element_count == 0:
                             return_status.append(ISEMAIL_CFWS_FWS)
@@ -322,7 +322,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # We can't start FWS in the middle of an element, so
                         # this better be the end
                         end_or_die = True
-                    
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_FWS
                     token_prior = token
@@ -331,7 +331,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     # At this point we should have a valid local-part
                     if len(context_stack) != 1:
                         raise SystemExit("Unexpected item on context stack")
-                    
+
                     if parseData[ISEMAIL_COMPONENT_LOCALPART] == '':
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_NOLOCALPART)
@@ -358,7 +358,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     elif context_prior in [ISEMAIL_CONTEXT_COMMENT,
                         ISEMAIL_CONTEXT_FWS]:
                         return_status.append(ISEMAIL_DEPREC_CFWS_NEAR_AT)
-                    
+
                     # Clear everything down for the domain parsing
                     context = ISEMAIL_COMPONENT_DOMAIN     # Where we are
                     context_stack = []                     # Where we have been
@@ -395,12 +395,12 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     else:
                         context_prior = context
                         o = ord(token)
-                        
-                        if (o < 33 or o > 126 or o == 10 or 
+
+                        if (o < 33 or o > 126 or o == 10 or
                             token in ISEMAIL_STRING_SPECIALS):
                             # Fatal error
                             return_status.append(ISEMAIL_ERR_EXPECTING_ATEXT)
-                            
+
                         parseData[ISEMAIL_COMPONENT_LOCALPART] += token
                         atomList[ISEMAIL_COMPONENT_LOCALPART][element_count] += token
                         element_len += 1
@@ -450,7 +450,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # must comply with RFC 5321 (and in turn RFC 1035), anything
                 # that is "semantically invisible" must comply only with RFC
                 # 5322.
-                
+
                 # Comment
                 if token == ISEMAIL_STRING_OPENPARENTHESIS:
                     if element_len == 0:
@@ -467,7 +467,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # We can't start a comment in the middle of an element,
                         # so this better be the end
                         end_or_die = True
-                    
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_COMMENT
                 # Next dot-atom element
@@ -497,7 +497,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # labels         63 octets or less
                         if element_len > 63:
                             return_status.append(ISEMAIL_RFC5322_LABEL_TOOLONG)
-                        
+
                         # CFWS is OK again now we're at the beginning of an
                         # element (although it may be obsolete CFWS)
                         end_or_die = False
@@ -519,23 +519,23 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     else:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_ATEXT)
-                    
+
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
-                    
+
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
                     # doesn't short-circuit
                     if token == ISEMAIL_STRING_CR:
                         skip = True
-                    
+
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
-                    
+
                     if element_len == 0:
                         if element_count == 0:
                             return_status.append(ISEMAIL_DEPREC_CFWS_NEAR_AT)
@@ -546,7 +546,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # We can't start FWS in the middle of an element, so
                         # this better be the end
                         end_or_die = True
-                        
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_FWS
                     token_prior = token
@@ -587,12 +587,12 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                 ("More atext found where none is allowed, but"
                                  "unrecognised prior context: %s" %
                                  context_prior))
-                    
-                    
+
+
                     o = ord(token)
                     # Assume this token isn't a hyphen unless we discover it is
                     hyphen_flag = False
-                    
+
                     if (o < 33 or o > 126 or
                         token in ISEMAIL_STRING_SPECIALS):
                         # Fatal error
@@ -602,14 +602,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                             # Hyphens can't be at the beginning of a subdomain
                             # Fatal error
                             return_status.append(ISEMAIL_ERR_DOMAINHYPHENSTART)
-                        
+
                         hyphen_flag = True
                     elif not ((o > 47 and o < 58) or
                         (o > 64 and o < 91) or
                         (o > 96 and o < 123)):
                         # Not an RFC 5321 subdomain, but still OK by RFC 5322
                         return_status.append(ISEMAIL_RFC5322_DOMAIN)
-                    
+
                     parseData[ISEMAIL_COMPONENT_DOMAIN] += token
                     atomList[ISEMAIL_COMPONENT_DOMAIN][element_count] += token
                     element_len += 1
@@ -625,7 +625,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #                       obs-dtext     ;  "[", "]", or "\"
                 #
                 #   obs-dtext       =   obs-NO-WS-CTL / quoted-pair
-                
+
                 # End of domain literal
                 if token == ISEMAIL_STRING_CLOSESQBRACKET:
                     if max(return_status) < ISEMAIL_DEPREC:
@@ -672,7 +672,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         #                  ; than 6 groups in addition to the
                         #                  ; "::" may be present.
                         #
-                        #   IPv6v4-full    = IPv6-hex 5(":" IPv6-hex) ":" 
+                        #   IPv6v4-full    = IPv6-hex 5(":" IPv6-hex) ":"
                         #                    IPv4-address-literal
                         #
                         #   IPv6v4-comp    = [IPv6-hex *3(":" IPv6-hex)] "::"
@@ -683,14 +683,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         #                  ; than 4 groups in addition to the
                         #                  ; "::" and IPv4-address-literal may
                         #                  ; be present.
-                        
+
                         max_groups = 8
                         index = False
                         addressLiteral = parseData[ISEMAIL_COMPONENT_LITERAL]
-                        
+
                         # Extract IPv4 part from the end of the address-literal
                         # (if there is one)
-                        regex = (   
+                        regex = (
                             r"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.)"
                             r"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
                         )
@@ -698,10 +698,10 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         if matchesIP:
                             index = addressLiteral.rfind(matchesIP.group(0))
                             if index != 0:
-                                # Convert IPv4 part to IPv6 format for further 
+                                # Convert IPv4 part to IPv6 format for further
                                 # testing
                                 addressLiteral = addressLiteral[0:index] + '0:0'
-                        
+
                         if index == 0 and index is not False:
                             # Nothing there except a valid IPv4 address, so ...
                             return_status.append(ISEMAIL_RFC5321_ADDRESSLITERAL)
@@ -714,14 +714,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                             matchesIP = IPv6.split(ISEMAIL_STRING_COLON)
                             groupCount = len(matchesIP)
                             index = IPv6.find(ISEMAIL_STRING_DOUBLECOLON)
-                            
+
                             if index == -1:
                                 # we need exactly the right number of groups
                                 if groupCount != max_groups:
                                     return_status.append(
                                         ISEMAIL_RFC5322_IPV6_GRPCOUNT
                                     )
-                            else:                                
+                            else:
                                 if index != IPv6.rfind(ISEMAIL_STRING_DOUBLECOLON):
                                     return_status.append(
                                         ISEMAIL_RFC5322_IPV6_2X2XCOLON
@@ -732,7 +732,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                         # end of an address with 7 other groups
                                         # in addition
                                         max_groups += 1
-                                        
+
                                     if groupCount > max_groups:
                                         return_status.append(
                                             ISEMAIL_RFC5322_IPV6_MAXGRPS
@@ -742,10 +742,10 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                         return_status.append(
                                             ISEMAIL_RFC5321_IPV6DEPRECATED
                                         )
-                            
+
                             # Revision 2.7: Daniel Marschall's new IPv6 testing
                             # strategy
-                            if (IPv6[0] == ISEMAIL_STRING_COLON and 
+                            if (IPv6[0] == ISEMAIL_STRING_COLON and
                                 IPv6[1] != ISEMAIL_STRING_COLON):
                                 # Address starts with a single colon
                                 return_status.append(ISEMAIL_RFC5322_IPV6_COLONSTRT)
@@ -761,7 +761,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                                 return_status.append(ISEMAIL_RFC5321_ADDRESSLITERAL)
                     else:
                         return_status.append(ISEMAIL_RFC5322_DOMAINLITERAL)
-                    
+
                     parseData[ISEMAIL_COMPONENT_DOMAIN] += token
                     atomList[ISEMAIL_COMPONENT_DOMAIN][element_count] += token
                     element_len += 1
@@ -774,21 +774,21 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
-                    
+
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
                     # doesn't short-circuit
                     if token == ISEMAIL_STRING_CR:
                         skip = True
-                    
+
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
-                    
+
                     return_status.append(ISEMAIL_CFWS_FWS)
-                    
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_FWS
                     token_prior = token
@@ -807,17 +807,17 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     #                   %d14-31 /   ;  return, line feed, and
                     #                   %d127       ;  white space characters
                     o = ord(token)
-                    
+
                     # CR, LF, SP & HTAB have already been parsed above
-                    if (o > 127 or o == 0 or 
+                    if (o > 127 or o == 0 or
                         token == ISEMAIL_STRING_OPENSQBRACKET):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_DTEXT)
                         break
                     elif o < 33 or o == 127:
                         return_status.append(ISEMAIL_RFC5322_DOMLIT_OBSDTEXT)
-                    
-                    
+
+
                     parseData[ISEMAIL_COMPONENT_LITERAL] += token
                     parseData[ISEMAIL_COMPONENT_DOMAIN] += token
                     atomList[ISEMAIL_COMPONENT_DOMAIN][element_count] += token
@@ -832,7 +832,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #                       [CFWS]
                 #
                 #   qcontent        =   qtext / quoted-pair
-                
+
                 # Quoted pair
                 if token == ISEMAIL_STRING_BACKSLASH:
                     context_stack.append(context)
@@ -841,19 +841,19 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Inside a quoted string, spaces are allow as regular
                 # characters. It's only FWS if we include HTAB or CRLF
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_HTAB]:
-                    
+
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
                     # doesn't short-circuit
                     if token == ISEMAIL_STRING_CR:
                         skip = True
-                
+
                     if (token == ISEMAIL_STRING_CR and (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF)):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
-                        
+
                     # http://tools.ietf.org/html/rfc5322#section-3.2.2
                     #   Runs of FWS, comment, or CFWS that occur between
                     #   lexical tokens in a structured header field are
@@ -867,7 +867,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     atomList[ISEMAIL_COMPONENT_LOCALPART][element_count] += (
                         ISEMAIL_STRING_SP)
                     element_len += 1
-                    
+
                     return_status.append(ISEMAIL_CFWS_FWS)
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_FWS
@@ -886,26 +886,26 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     #                     %d35-91 /   ;  characters not
                     #                     %d93-126 /  ;  including "\" or the
                     #                     obs-qtext   ;  quote character
-                    #                  
+                    #
                     #   obs-qtext      =  obs-NO-WS-CTL
-                    #                  
+                    #
                     #   obs-NO-WS-CTL  =  %d1-8 /     ; US-ASCII control
                     #                     %d11 /      ;  characters that do not
                     #                     %d12 /      ;  include the carriage
                     #                     %d14-31 /   ;  return, line feed, and
                     #                     %d127       ;  white space characters
                     o = ord(token)
-                    
+
                     if o > 127 or o == 0 or o == 10:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_QTEXT)
                     elif o < 32 or o == 127:
                         return_status.append(ISEMAIL_DEPREC_QTEXT)
-                        
+
                     parseData[ISEMAIL_COMPONENT_LOCALPART] += token
                     atomList[ISEMAIL_COMPONENT_LOCALPART][element_count] += token
                     element_len += 1
-                
+
                 # TODO
                 # http://tools.ietf.org/html/rfc5322#section-3.4.1
                 #   If the string can be represented as a dot-atom (that is, it
@@ -913,7 +913,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #   surrounded by atext characters), then the dot-atom form
                 #   SHOULD be used and the quoted-string form SHOULD NOT be
                 #   used.
-                
+
             #--------------------------------------------------------
             # Quoted pair
             #--------------------------------------------------------
@@ -935,16 +935,16 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #                       %d127      ;  white space characters
                 #
                 # i.e. obs-qp       =  "\" (%d0-8, %d10-31 / %d127)
-                
+
                 o = ord(token)
-                
+
                 if o > 127:
                     # Fatal error
                     return_status.append(ISEMAIL_ERR_EXPECTING_QPAIR)
                 elif (o < 31 and o != 9) or o == 127:
                     # SP & HTAB are allowed
                     return_status.append(ISEMAIL_DEPREC_QP)
-                    
+
                 # At this point we know where this qpair occurred so
                 # we could check to see if the character actually
                 # needed to be quoted at all.
@@ -953,11 +953,11 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #   form that uses the minimum quoting possible.
                 # TODO: check whether the character needs to be quoted
                 #       (escaped) in this context
-                
+
                 context_prior = context
                 context = context_stack.pop()   # End of qpair
                 token = ISEMAIL_STRING_BACKSLASH + token
-                
+
                 if context == ISEMAIL_CONTEXT_COMMENT:
                     pass
                 elif context == ISEMAIL_CONTEXT_QUOTEDSTRING:
@@ -976,7 +976,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     SystemExit(
                         ("Quoted pair logic invoked in an invalid "
                          "context: %s" % context))
-            
+
             #--------------------------------------------------------
             # Comment
             #--------------------------------------------------------
@@ -985,7 +985,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #   comment         =   "(" *([FWS] ccontent) [FWS] ")"
                 #
                 #   ccontent        =   ctext / quoted-pair / comment
-                
+
                 # Nested comment
                 if token == ISEMAIL_STRING_OPENPARENTHESIS:
                     # Nested comments are OK
@@ -995,7 +995,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 elif token == ISEMAIL_STRING_CLOSEPARENTHESIS:
                     context_prior = context
                     context = context_stack.pop()
-                    
+
                     # http://tools.ietf.org/html/rfc5322#section-3.2.2
                     #   Runs of FWS, comment, or CFWS that occur between
                     #   lexical tokens in a structured header field are
@@ -1005,7 +1005,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     # add a space to the address wherever CFWS appears. This
                     # would result in any addr-spec that had CFWS outside a
                     # quoted string being invalid for RFC 5321.
-                    
+
                     # if context in [ISEMAIL_COMPONENT_LOCALPART,
                     #    ISEMAIL_COMPONENT_DOMAIN]:
                     #    parseData[context] += ISEMAIL_STRING_SP
@@ -1018,22 +1018,22 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 # Folding White Space (FWS)
                 elif token in [ISEMAIL_STRING_CR, ISEMAIL_STRING_SP,
                     ISEMAIL_STRING_HTAB]:
-                    
+
                     # TODO: Clean this up!
                     # Skip simulates the use of ++ operator if the latter check
                     # doesn't short-circuit
                     if token == ISEMAIL_STRING_CR:
                         skip = True
-                    
+
                     if token == ISEMAIL_STRING_CR and (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF):
-                        
+
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                         break
-                        
+
                     return_status.append(ISEMAIL_CFWS_FWS)
-                    
+
                     context_stack.append(context)
                     context = ISEMAIL_CONTEXT_FWS
                     token_prior = token
@@ -1041,7 +1041,7 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 else:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.3
                     #   ctext           =   %d33-39 /   ; Printable US-ASCII
-                    #                       %d42-91 /   ;  characters not 
+                    #                       %d42-91 /   ;  characters not
                     #                       %d93-126 /  ;  including "(", ")",
                     #                       obs-ctext   ;  or "\"
                     #
@@ -1050,21 +1050,21 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     #   obs-NO-WS-CTL   =   %d1-8 /      ; US-ASCII control
                     #                       %d11 /       ;  characters that do
                     #                       %d12 /       ;  not include the
-                    #                       %d14-31 /    ;  carriage return, 
-                    #                       %d127        ;  line feed, and 
+                    #                       %d14-31 /    ;  carriage return,
+                    #                       %d127        ;  line feed, and
                     #                                    ;  white space
                     #                                    ;  characters
-                    
+
                     o = ord(token)
-                    
+
                     if o > 127 or o == 0 or o == 10:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_EXPECTING_CTEXT)
                         break
                     elif o < 32 or o == 127:
                         return_status.append(ISEMAIL_DEPREC_CTEXT)
-                    
-            
+
+
             #--------------------------------------------------------
             # Folding White Space (FWS)
             #--------------------------------------------------------
@@ -1083,13 +1083,13 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                 #   of white space.
                 #
                 #   obs-FWS         =   1*([CRLF] WSP)
-                
+
                 if token_prior == ISEMAIL_STRING_CR:
                     if token == ISEMAIL_STRING_CR:
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_FWS_CRLF_X2)
                         break
-                    
+
                     if crlf_count != -1:
                         crlf_count += 1
                         if crlf_count > 1:
@@ -1097,15 +1097,15 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                             return_status.append(ISEMAIL_DEPREC_FWS)
                     else:
                         crlf_count = 1
-                
+
                 if token == ISEMAIL_STRING_CR:
-                    
+
                     # Skip simulates the use of ++ operator
                     skip = True
-                
+
                     if (i+1 == raw_length or
                         _unicode_help(email[i+1]) != ISEMAIL_STRING_LF):
-                                                
+
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_CR_NO_LF)
                 elif token in [ISEMAIL_STRING_SP, ISEMAIL_STRING_HTAB]:
@@ -1115,14 +1115,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                         # Fatal error
                         return_status.append(ISEMAIL_ERR_FWS_CRLF_END)
                         break
-                    
+
                     if crlf_count != -1:
                         crlf_count = -1
-                    
+
                     context_prior = context
                     # End of FWS
                     context = context_stack.pop()
-                    
+
                     # http://tools.ietf.org/html/rfc5322#section-3.2.2
                     #   Runs of FWS, comment, or CFWS that occur between
                     #   lexical tokens in a structured header field are
@@ -1132,33 +1132,33 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
                     # add a space to the address wherever CFWS appears. This
                     # would result in any addr-spec that had CFWS outside a
                     # quoted string being invalid for RFC 5321.
-                    
+
                     # if context in [ISEMAIL_COMPONENT_LOCALPART,
                     #    ISEMAIL_COMPONENT_DOMAIN]:
                     #    parseData[context] += ISEMAIL_STRING_SP
                     #    atomList[context][element_count] += ISEMAIL_STRING_SP
                     #    element_len += 1
-                    
+
                     # Look at this token again in the parent context
                     repeat = True
-                
+
                 token_prior = token
-                
+
             #--------------------------------------------------------
             # A context we aren't expecting
             #--------------------------------------------------------
             else:
                 SystemExit("Unknown context: %s" % context)
-                
+
         if DEBUG:
             print u"%i\t%s\t%s\t%i\t%s" % (context, end_or_die, ord(token), max(return_status), str(parseData))
 
         # No point in going on if we've got a fatal error
         if max(return_status) > ISEMAIL_RFC5322:
             break
-    
-    
-        
+
+
+
     # Some simple final tests
     if max(return_status) < ISEMAIL_RFC5322:
         if context == ISEMAIL_CONTEXT_QUOTEDSTRING:
@@ -1215,10 +1215,10 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 		# labels           63 octets or less
         elif element_len > 63:
             return_status.append(ISEMAIL_RFC5322_LABEL_TOOLONG)
-            
+
     # Check DNS?
     dns_checked = False
-    
+
     if checkDNS and max(return_status) < ISEMAIL_DNSWARN:
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
 		#   Names that can
@@ -1239,12 +1239,12 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         # reasons we will not repeat the DNS lookup for the CNAME's target, but
         # we will raise a warning because we didn't immediately find an MX
         # record.
-        
+
         # Checking TLD DNS seems to work only if you explicitly check for the
         # root
         if element_count == 0:
             parseData[ISEMAIL_COMPONENT_DOMAIN] += '.'
-        
+
         try:
             result = dns.resolver.query(parseData[ISEMAIL_COMPONENT_DOMAIN],
                 'MX')
@@ -1255,14 +1255,14 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
         except dns.resolver.NoAnswer:
             # MX-record for domain can't be found
             return_status.append(ISEMAIL_DNSWARN_NO_MX_RECORD)
-            
+
             try:
                 # TODO: See if we can/need to narrow to A / CNAME
                 result = dns.resolver.query(parseData[ISEMAIL_COMPONENT_DOMAIN])
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
                 return_status.append(ISEMAIL_DNSWARN_NO_RECORD)
-            
+
     # Check for TLD addresses
 	# -----------------------
 	# TLD addresses are specifically allowed in RFC 5321 but they are
@@ -1295,27 +1295,27 @@ def is_email(email, checkDNS = False, errorLevel = False, parseData = {}):
 	#   However, a valid host name can never have the dotted-decimal
 	#   form #.#.#.#, since this change does not permit the highest-level
 	#   component label to start with a digit even if it is not all-numeric.
-    
+
     if not dns_checked and max(return_status) < ISEMAIL_DNSWARN:
         if element_count == 0:
             return_status.append(ISEMAIL_RFC5321_TLD)
-        
+
         try:
             float(atomList[ISEMAIL_COMPONENT_DOMAIN][element_count][0])
             return_status.append(ISEMAIL_RFC5321_TLDNUMERIC)
         except ValueError:
             pass
-            
+
     return_status = list(set(return_status))
     final_status = max(return_status)
-    
+
     if len(return_status) != 1:
         # Remove redundant ISEMAIL_VALID
         return_status.pop(0)
-        
+
     parseData['status'] = return_status
-    
+
     if final_status < threshold:
         final_status = ISEMAIL_VALID
-    
+
     return final_status if diagnose else final_status < ISEMAIL_THRESHOLD

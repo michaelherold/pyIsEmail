@@ -1,6 +1,6 @@
 __author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2012 Michael Herold"
-__license__ = "BSD"
+__copyright__ = "Copyright (c) 2013 Michael Herold"
+__license__ = "MIT"
 
 import unittest
 import xml.etree.ElementTree as ET
@@ -109,21 +109,21 @@ ISEMAIL_STRING_HTAB = "\t"
 ISEMAIL_STRING_CR = "\r"
 ISEMAIL_STRING_LF = "\n"
 ISEMAIL_STRING_IPV6TAG = 'IPv6:'
-# US-ASCII visible characters not valid for atext 
+# US-ASCII visible characters not valid for atext
 # (http:#tools.ietf.org/html/rfc5322#section-3.2.3)
 ISEMAIL_STRING_SPECIALS = '()<>[]:;@\\,."'
 
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
-    
+
     document = ET.parse('pyisemail/test/data/tests.xml')
     root = document.getroot()
-    
+
     scenarios = []
-    
+
     for test in root.iter('test'):
         id = str(test.attrib['id'])
-        
+
         attrs = {}
         attrs['id'] = str(test.attrib['id'])
         attrs['address'] = get_node_text(test.find('address').text)
@@ -131,38 +131,38 @@ def get_scenarios():
         attrs['diagnosis'] = get_node_text(test.find('diagnosis').text)
         attrs['source'] = get_node_text(test.find('source').text)
         attrs['source_link'] = get_node_text(test.find('sourcelink').text)
-        
+
         scenario = (id, attrs)
-        
+
         scenarios.append(scenario)
-        
+
     return scenarios
-    
+
 def get_node_text(text):
 
     """Ensures that we have a string from the XML document."""
-    
+
     if text:
         return unicode(text)
     else:
         return ''
-    
+
 
 class ParseTestCase(TestWithScenarios):
-    
+
     scenarios = get_scenarios()
-    
+
     def test_is_email(self):
-    
+
         p = {}
-    
+
         result = is_email(self.address, True, True, p)
         diagnosis = eval(self.diagnosis)
-        
+
         self.assertEqual(
             result,
             diagnosis,
             ("%s (%s): Got %s, but expected %s. (%s)"
              % (self.id, self.address, result, diagnosis, str(p)))
         )
-        
+

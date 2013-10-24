@@ -1,6 +1,6 @@
 __author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2012 Michael Herold"
-__license__ = "BSD"
+__copyright__ = "Copyright (c) 2013 Michael Herold"
+__license__ = "MIT"
 
 from setuptools import setup, find_packages
 from pyisemail.common.version import version
@@ -13,7 +13,7 @@ setup(
     classifiers = [
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Operating System :: OS Independent"
         "Topic :: Communications :: Email",
@@ -23,7 +23,7 @@ setup(
     author = "Michael Herold",
     author_email = "michael.j.herold@gmail.com",
     url = "https://github.com/michaelherold/pyIsEmail",
-    license = "BSD",
+    license = "MIT",
     packages = find_packages(
         exclude = ["*.test", "*.test.*", "test.*", "test"]
     ),
