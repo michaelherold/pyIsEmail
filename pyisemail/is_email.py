@@ -114,8 +114,6 @@ ISEMAIL_STRING_SPECIALS = '()<>[]:;@\\,."'
 E_ERROR = 1
 E_WARNING = 2
 
-DEBUG = False
-
 
 def _unicode_help(token):
     """Transforms the ASCII control character symbols to their real character.
@@ -136,11 +134,12 @@ def _unicode_help(token):
 def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
     """Check that an email address conforms to RFCs 5321, 5322 and others
 
-    As of Version 3.0, we are now distinguishing clearly between a Mailbox
-    as defined by RFC 5321 and an addr-spec as defined by RFC 5322. Depending
-    on the context, either can be regarded as a valid email address. The
-    RFC 5321 Mailbox specification is more restrictive (comments, white space
-    and obsolete forms are not allowed)
+    More specifically, see the follow RFCs:
+        * http://tools.ietf.org/html/rfc5321
+        * http://tools.ietf.org/html/rfc5322
+        * http://tools.ietf.org/html/rfc4291#section-2.2
+        * http://tools.ietf.org/html/rfc1123#section-2.1
+        * http://tools.ietf.org/html/rfc3696) (guidance only)
 
     Keyword arguments:
     email      -- email address to check.
@@ -150,16 +149,6 @@ def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
 
     """
 
-    # Check that $email is a valid address. Read the following RFCs to
-    # understand the constraints:
-    #   (http://tools.ietf.org/html/rfc5321)
-    #   (http://tools.ietf.org/html/rfc5322)
-    #   (http://tools.ietf.org/html/rfc4291#section-2.2)
-    #   (http://tools.ietf.org/html/rfc1123#section-2.1)
-    #   (http://tools.ietf.org/html/rfc3696) (guidance only)
-    # version 2.0: Enhance $diagnose parameter to $errorlevel
-    # version 3.0: Introduced status categories
-    # revision 3.1: BUG: $parsedata was passed by value instead of by reference
     if isinstance(errorLevel, bool):
         threshold = ISEMAIL_VALID
         diagnose = errorLevel
@@ -195,9 +184,6 @@ def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
     skip = False                # Skip flag that simulates i++
     crlf_count = -1             # crlf_count = -1 == !isset(crlf_count)
 
-    if DEBUG:
-        print "con\tend\ttok\tret\tcon\tend\ttok\tret\tpar\t\tat"
-
     for i in xrange(raw_length):
 
         # Skip simulates the use of ++ operator
@@ -211,12 +197,6 @@ def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
         #    characters down to the actual ASCII control characters, we
         #    must do this so ensure it works the same way
         token = _unicode_help(token)
-
-        if DEBUG:
-            print u"%i\t%s\t%s\t%i\t" % (context,
-                                         end_or_die,
-                                         ord(token),
-                                         max(return_status)),
 
         # Switch to simulate decrementing; needed for FWS
         repeat = True
@@ -1151,13 +1131,6 @@ def is_email(email, checkDNS=False, errorLevel=False, parseData={}):
             #--------------------------------------------------------
             else:
                 SystemExit("Unknown context: %s" % context)
-
-        if DEBUG:
-            print u"%i\t%s\t%s\t%i\t%s" % (context,
-                                           end_or_die,
-                                           ord(token),
-                                           max(return_status),
-                                           str(parseData))
 
         # No point in going on if we've got a fatal error
         if max(return_status) > ISEMAIL_RFC5322:
