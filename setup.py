@@ -2,42 +2,44 @@ __author__ = "Michael Herold"
 __copyright__ = "Copyright (c) 2013 Michael Herold"
 __license__ = "MIT"
 
-from setuptools import setup, find_packages
-from pyisemail.common.version import version
+from setuptools import setup
+from pyisemail import __version__
 
-setup(name="pyIsEmail",
-      version=version,
-      description="Email format checker based on http://isemail.info",
-      long_description=open("README.rst").read(),
-      classifiers=[
-          "Development Status :: 1 - Planning",
-          "Intended Audience :: Developers",
-          "License :: OSI Approved :: MIT License",
-          "Programming Language :: Python",
-          "Operating System :: OS Independent"
-          "Topic :: Communications :: Email",
-          "Topic :: Software Development :: Libraries",
-      ],
-      keywords="",
-      author="Michael Herold",
-      author_email="michael.j.herold@gmail.com",
-      url="https://github.com/michaelherold/pyIsEmail",
-      license="MIT",
-      packages=find_packages(
-          exclude=["*.test", "*.test.*", "test.*", "test"]
-      ),
-      include_package_data=True,
-      exclude_package_data={
-          '': ['.gitignore', '.venv']
-      },
-      zip_safe=False,
-      install_requires=[
-          "dnspython >= 1.10.0"
-      ],
-      setup_requires=["setuptools-git >= 0.4.2"],
-      tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
-      test_suite="pyisemail.test",
-      entry_points="""
-      # -*- Entry points: -*-
-      """
-      )
+kwargs = {}
+
+with open('README.rst') as f:
+    long_description = f.read()
+
+setup(
+    name="pyIsEmail",
+    version=__version__,
+    description="Email format checker based on http://isemail.info",
+    long_description=long_description,
+    classifiers=[
+        "Development Status :: 1 - Planning",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Operating System :: OS Independent"
+        "Topic :: Communications :: Email",
+        "Topic :: Software Development :: Libraries",
+    ],
+    keywords="",
+    author="Michael Herold",
+    author_email="michael.j.herold@gmail.com",
+    url="https://github.com/michaelherold/pyIsEmail",
+    license="MIT",
+    packages=["pyisemail", "pyisemail.test"],
+    include_package_data=True,
+    exclude_package_data={
+        '': ['.gitignore']
+    },
+    zip_safe=False,
+    install_requires=[
+        "dnspython >= 1.10.0"
+    ],
+    setup_requires=["setuptools-git >= 0.4.2"],
+    tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
+    test_suite="pyisemail.test",
+    **kwargs
+)
