@@ -1,7 +1,7 @@
 from pyisemail.grammars import RFC2822, RFC5322, RFC5322Obsolete
 
 
-class Parser:
+class EmailValidator(object):
 
     def __init__(self):
         self.grammars = {
@@ -10,9 +10,11 @@ class Parser:
             'rfc5322_obsolete': RFC5322Obsolete()
         }
 
-    def parse(self, address, grammar='rfc5322'):
+    def is_email(self, address, grammar='rfc5322'):
         try:
-            parsed = self.grammars[grammar].parseString(address)
+            parsed = self.grammars[grammar].parse(address)
             return parsed is not None
         except:
             return False
+
+    is_valid = is_email
