@@ -1,0 +1,27 @@
+from pyisemail.diagnosis import BaseDiagnosis
+
+
+class DeprecatedDiagnosis(BaseDiagnosis):
+    DESCRIPTION = ("Address contains deprecated elements "
+                   "but may still be valid in restricted contexts.")
+
+    MESSAGES = {
+        'LOCALPART': "Address contains a local part in deprecated form.",
+        'FWS': "Address contains Folding White Space in deprecated form.",
+        'QTEXT': "Address contains a quoted string in deprecated form.",
+        'QP': "Address contains a quoted pair in deprecated form.",
+        'COMMENT': "Address contains a comment in deprecated form.",
+        'CTEXT': "Address contains a comment with a deprecated character.",
+        'CFWS_NEAR_AT': ("Address contains a comment or Folding White Space "
+                         "around the @ sign."),
+    }
+
+    REFERENCES = {
+        'LOCALPART': ['obs-local-part'],
+        'FWS': ['obs-local-part', 'obs-domain'],
+        'QTEXT': ['obs-qtext'],
+        'QP': ['obs-qp'],
+        'COMMENT': ['obs-local-part', 'obs-domain'],
+        'CTEXT': ['obs-ctext'],
+        'CFWS_NEAR_AT': ['CFWS-near-at', 'SHOULD-NOT'],
+    }

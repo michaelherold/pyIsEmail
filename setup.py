@@ -29,7 +29,7 @@ setup(
     author_email="michael.j.herold@gmail.com",
     url="https://github.com/michaelherold/pyIsEmail",
     license="MIT",
-    packages=["pyisemail", "pyisemail.test"],
+    packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.test"],
     include_package_data=True,
     exclude_package_data={
         '': ['.gitignore']

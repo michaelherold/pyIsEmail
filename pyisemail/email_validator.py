@@ -10,11 +10,7 @@ class EmailValidator(object):
             'rfc5322_obsolete': RFC5322Obsolete()
         }
 
-    def is_email(self, address, grammar='rfc5322'):
-        try:
-            parsed = self.grammars[grammar].parse(address)
-            return parsed is not None
-        except:
-            return False
+    def is_email(self, address, diagnose=False, grammar='rfc5322'):
+        return self.grammars[grammar].parse(address, diagnose)
 
     is_valid = is_email

@@ -1,4 +1,5 @@
 from pyparsing import ParserElement, ParseException
+from pyisemail.diagnosis import InvalidDiagnosis, ValidDiagnosis
 
 
 class Grammar(object):
@@ -12,9 +13,19 @@ class Grammar(object):
         else:
             self.addr_spec = local_part + "@" + domain
 
-    def parse(self, address):
+    def parse(self, address, diagnose=False):
         try:
             parsed = self.addr_spec.parseString(address)
-            return parsed is not None
-        except ParseException:
-            return False
+            if diagnose:
+                return (parsed is not None, ValidDiagnosis())
+            else:
+                return parsed is not None
+        except ParseException as err:
+            if diagnose:
+                if err.parserElement == "@" or "@" not in err.pstr:
+                    diagnosis = InvalidDiagnosis('NODOMAIN')
+                else:
+                    diagnosis = None
+                return (False, diagnosis)
+            else:
+                return False
