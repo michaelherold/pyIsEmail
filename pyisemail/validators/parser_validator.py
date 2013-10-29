@@ -1,31 +1,12 @@
 import re
-import dns.resolver
 from pyisemail import EmailValidator
 from pyisemail.diagnosis import BaseDiagnosis, CFWSDiagnosis
-from pyisemail.diagnosis import DeprecatedDiagnosis, DNSDiagnosis
+from pyisemail.diagnosis import DeprecatedDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
+from pyisemail.utils import enum
 
-
-def enum(**enums):
-    return type('Enum', (), enums)
-
-
-def to_char(token):
-    """Transforms the ASCII control character symbols to their real char.
-
-    Note: If the token is not an ASCII control character symbol, just
-    return the token.
-
-    Keyword arguments:
-    token -- the token to transform
-
-    """
-    if ord(token) in range(9216, 9229 + 1):
-        token = unichr(ord(token) - 9216)
-
-    return token
-
+__all__ = ["ParserValidator"]
 
 Char = enum(AT='@',
             BACKSLASH='\\',
@@ -56,9 +37,24 @@ Context = enum(LOCALPART=0,
                QUOTEDPAIR=6)
 
 
+def to_char(token):
+    """Transforms the ASCII control character symbols to their real char.
+
+    Note: If the token is not an ASCII control character symbol, just
+    return the token.
+
+    Keyword arguments:
+    token -- the token to transform
+
+    """
+    if ord(token) in range(9216, 9229 + 1):
+        token = unichr(ord(token) - 9216)
+
+    return token
+
+
 class ParserValidator(EmailValidator):
     def is_email(self, address, diagnose=False):
-    #def is_email(self, address, checkDNS=False, errorLevel=False, parse_data={}):
         """Check that an address address conforms to RFCs 5321, 5322 and others
 
         More specifically, see the follow RFCs:
@@ -85,9 +81,9 @@ class ParserValidator(EmailValidator):
         context_prior = Context.LOCALPART        # Where we just came from
         token = ''                               # The current character
         token_prior = ''                         # The previous character
-        parse_data[Context.LOCALPART] = ''                  # The address' components
+        parse_data[Context.LOCALPART] = ''       # The address' components
         parse_data[Context.DOMAIN] = ''
-        atomList = {
+        atom_list = {
             Context.LOCALPART: [''],
             Context.DOMAIN: ['']
         }                                        # The address' dot-atoms
@@ -141,7 +137,8 @@ class ParserValidator(EmailValidator):
                             if element_count == 0:
                                 return_status.append(CFWSDiagnosis('COMMENT'))
                             else:
-                                return_status.append(DeprecatedDiagnosis('COMMENT'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('COMMENT'))
                         else:
                             return_status.append(CFWSDiagnosis('COMMENT'))
                             # We can't start a comment in the middle of an
@@ -154,57 +151,61 @@ class ParserValidator(EmailValidator):
                         if element_len == 0:
                             # Another dot, already? Fatal error
                             if element_count == 0:
-                                return_status.append(InvalidDiagnosis('DOT_START'))
+                                return_status.append(
+                                    InvalidDiagnosis('DOT_START'))
                             else:
-                                return_status.append(InvalidDiagnosis('CONSECUTIVEDOTS'))
+                                return_status.append(
+                                    InvalidDiagnosis('CONSECUTIVEDOTS'))
                         else:
-                            # The entire local-part can be a quoted string for RFC
-                            # 5321. If it's just one atom that is quoted then it's
-                            # an RFC 5322 obsolete form
+                            # The entire local-part can be a quoted string for
+                            # RFC 5321. If it's just one atom that is quoted
+                            # then it's an RFC 5322 obsolete form
                             if end_or_die:
-                                return_status.append(DeprecatedDiagnosis('LOCALPART'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('LOCALPART'))
 
-                            # CFWS & quoted strings are OK again now we're at the
-                            # beginning of an element (although they are obsolete
-                            # forms)
+                            # CFWS & quoted strings are OK again now we're at
+                            # the beginning of an element (although they are
+                            # obsolete forms)
                             end_or_die = False
                             element_len = 0
                             element_count += 1
                             parse_data[Context.LOCALPART] += token
-                            atomList[Context.LOCALPART].append('')
+                            atom_list[Context.LOCALPART].append('')
                     elif token == Char.DQUOTE:
                         if element_len == 0:
-                            # The entire local-part can be a quoted string for RFC
-                            # 5321. If it's just one atom that is quoted then it's
-                            # an RFC 5322 obsolete form
+                            # The entire local-part can be a quoted string for
+                            # RFC 5321. If it's just one atom that is quoted
+                            # then it's an RFC 5322 obsolete form
                             if element_count == 0:
-                                return_status.append(RFC5321Diagnosis('QUOTEDSTRING'))
+                                return_status.append(
+                                    RFC5321Diagnosis('QUOTEDSTRING'))
                             else:
-                                return_status.append(DeprecatedDiagnosis('LOCALPART'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('LOCALPART'))
 
                             parse_data[Context.LOCALPART] += token
-                            atomList[Context.LOCALPART][element_count] += token
+                            atom_list[Context.LOCALPART][element_count] += token
                             element_len += 1
                             end_or_die = True
                             context_stack.append(context)
                             context = Context.QUOTEDSTRING
                         else:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_ATEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_ATEXT'))
                     # Folding White Space (FWS)
                     elif token in [Char.CR, Char.SP, Char.HTAB]:
-                        # TODO: Clean this up!
-                        # Skip simulates the use of ++ operator if the latter check
-                        # doesn't short-circuit
+                        # Skip simulates the use of ++ operator if the latter
+                        # check doesn't short-circuit
                         if token == Char.CR:
                             skip = True
 
-                        if (token == Char.CR and (
-                                        i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF)):
-                            # Fatal error
-                            return_status.append(InvalidDiagnosis('CR_NO_LF'))
-                            break
+                            if (i+1 == raw_length or
+                                    to_char(address[i+1]) != Char.LF):
+                                return_status.append(
+                                    InvalidDiagnosis('CR_NO_LF'))
+                                break
 
                         if element_len == 0:
                             if element_count == 0:
@@ -222,15 +223,16 @@ class ParserValidator(EmailValidator):
                     # @
                     elif token == Char.AT:
                         # At this point we should have a valid local-part
-                        if len(context_stack) != 1: # pragma: no cover
-                                if diagnose:
-                                    return InvalidDiagnosis('BAD_PARSE')
-                                else:
-                                    return False
+                        if len(context_stack) != 1:  # pragma: no cover
+                            if diagnose:
+                                return InvalidDiagnosis('BAD_PARSE')
+                            else:
+                                return False
 
                         if parse_data[Context.LOCALPART] == '':
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('NOLOCALPART'))
+                            return_status.append(
+                                InvalidDiagnosis('NOLOCALPART'))
                         elif element_len == 0:
                             # Fatal error
                             return_status.append(InvalidDiagnosis('DOT_END'))
@@ -238,21 +240,23 @@ class ParserValidator(EmailValidator):
                         #   The maximum total length of a user name or other
                         #   local-part is 64 octets.
                         elif len(parse_data[Context.LOCALPART]) > 64:
-                            return_status.append(RFC5322Diagnosis('LOCAL_TOOLONG'))
+                            return_status.append(
+                                RFC5322Diagnosis('LOCAL_TOOLONG'))
                         # http://tools.ietf.org/html/rfc5322#section-3.4.1
                         #   Comments and folding white space
                         #   SHOULD NOT be used around the "@" in the addr-spec.
                         #
                         # http://tools.ietf.org/html/rfc2119
                         # 4. SHOULD NOT   This phrase, or the phrase "NOT
-                        #    RECOMMENDED" mean that there may exist valid reasons
-                        #    in particular circumstances when the particular
-                        #    behavior is acceptable or even useful, but the full
-                        #    implications should be understood and the case
-                        #    carefully weighed before implementing any behavior
-                        #    described with this label.
+                        #    RECOMMENDED" mean that there may exist valid
+                        #    reasons in particular circumstances when the
+                        #    particular behavior is acceptable or even useful,
+                        #    but the full implications should be understood and
+                        #    the case carefully weighed before implementing any
+                        #    behavior described with this label.
                         elif context_prior in [Context.COMMENT, Context.FWS]:
-                            return_status.append(DeprecatedDiagnosis('CFWS_NEAR_AT'))
+                            return_status.append(
+                                DeprecatedDiagnosis('CFWS_NEAR_AT'))
 
                         # Clear everything down for the domain parsing
                         context = Context.DOMAIN
@@ -265,9 +269,9 @@ class ParserValidator(EmailValidator):
                     else:
                         # http://tools.ietf.org/html/rfc5322#section-3.2.3
                         #    atext  =  ALPHA / DIGIT /  ; Printable US-ASCII
-                        #              "!" / "#" /      ; characters not including
-                        #              "$" / "%" /      ; specials. Used for atoms.
-                        #              "&" / "'" /
+                        #              "!" / "#" /      ; characters not
+                        #              "$" / "%" /      ; including specials.
+                        #              "&" / "'" /      ; Used for atoms.
                         #              "*" / "+" /
                         #              "-" / "/" /
                         #              "=" / "?" /
@@ -276,12 +280,15 @@ class ParserValidator(EmailValidator):
                         #              "|" / "}" /
                         #              "~"
                         if end_or_die:
-                            # We have encountered atext where it is no longer valid
+                            # We have encountered atext where it is no longer
+                            # valid
                             if context_prior in [Context.COMMENT, Context.FWS]:
-                                return_status.append(InvalidDiagnosis('ATEXT_AFTER_CFWS'))
+                                return_status.append(
+                                    InvalidDiagnosis('ATEXT_AFTER_CFWS'))
                             elif context_prior == Context.QUOTEDSTRING:
-                                return_status.append(InvalidDiagnosis('ATEXT_AFTER_QS'))
-                            else: # pragma: no cover
+                                return_status.append(
+                                    InvalidDiagnosis('ATEXT_AFTER_QS'))
+                            else:  # pragma: no cover
                                 if diagnose:
                                     return InvalidDiagnosis('BAD_PARSE')
                                 else:
@@ -290,11 +297,13 @@ class ParserValidator(EmailValidator):
                             context_prior = context
                             o = ord(token)
 
-                            if (o < 33 or o > 126 or o == 10 or token in Char.SPECIALS):
-                                return_status.append(InvalidDiagnosis('EXPECTING_ATEXT'))
+                            if (o < 33 or o > 126 or o == 10 or
+                                    token in Char.SPECIALS):
+                                return_status.append(
+                                    InvalidDiagnosis('EXPECTING_ATEXT'))
 
                             parse_data[Context.LOCALPART] += token
-                            atomList[Context.LOCALPART][element_count] += token
+                            atom_list[Context.LOCALPART][element_count] += token
                             element_len += 1
                 #--------------------------------------------------------
                 # Domain
@@ -307,11 +316,13 @@ class ParserValidator(EmailValidator):
                     #
                     #   dot-atom-text  = 1*atext *("." 1*atext)
                     #
-                    #   domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+                    #   domain-literal = [CFWS]
+                    #                    "[" *([FWS] dtext) [FWS] "]"
+                    #                    [CFWS]
                     #
                     #   dtext          = %d33-90 /     ; Printable US-ASCII
-                    #                    %d94-126 /    ;  characters not including
-                    #                    obs-dtext     ;  "[", "]", or "\"
+                    #                    %d94-126 /    ; characters not
+                    #                    obs-dtext     ; including [, ], or \
                     #
                     #   obs-domain     = atom *("." atom)
                     #
@@ -319,7 +330,9 @@ class ParserValidator(EmailValidator):
                     #
                     #
                     # http://tools.ietf.org/html/rfc5321#section-4.1.2
-                    #   Mailbox       = Local-part "@" ( Domain / address-literal )
+                    #   Mailbox       = Local-part
+                    #                   "@"
+                    #                   ( Domain / address-literal )
                     #
                     #   Domain        = sub-domain *("." sub-domain)
                     #
@@ -331,33 +344,36 @@ class ParserValidator(EmailValidator):
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
                     #      Note: A liberal syntax for the domain portion of
                     #      addr-spec is given here.  However, the domain portion
-                    #      contains addressing information specified by and used in
-                    #      other protocols (e.g., [RFC1034], [RFC1035], [RFC1123],
-                    #      [RFC5321]).  It is therefore incumbent upon
+                    #      contains addressing information specified by and used
+                    #      in other protocols (e.g., RFC 1034, RFC 1035, RFC
+                    #      1123, RFC5321).  It is therefore incumbent upon
                     #      implementations to conform to the syntax of addresses
                     #      for the context in which they are used.
                     # is_email() author's note: it's not clear how to interpret
-                    # this in the context of a general address address validator. The
-                    # conclusion I have reached is this: "addressing information"
-                    # must comply with RFC 5321 (and in turn RFC 1035), anything
-                    # that is "semantically invisible" must comply only with RFC
-                    # 5322.
+                    # this in the context of a general address address
+                    # validator. The conclusion I have reached is this:
+                    # "addressing information" must comply with RFC 5321 (and in
+                    # turn RFC 1035), anything that is "semantically invisible"
+                    # must comply only with RFC 5322.
 
                     # Comment
                     if token == Char.OPENPARENTHESIS:
                         if element_len == 0:
-                            # Comments at the start of the domain are deprecated in
-                            # the text
-                            # Comments at the start of a subdomain are obs-domain
+                            # Comments at the start of the domain are deprecated
+                            # in the text
+                            # Comments at the start of a subdomain are
+                            # obs-domain
                             # (http://tools.ietf.org/html/rfc5322#section-3.4.1)
                             if element_count == 0:
-                                return_status.append(DeprecatedDiagnosis('CFWS_NEAR_AT'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('CFWS_NEAR_AT'))
                             else:
-                                return_status.append(DeprecatedDiagnosis('COMMENT'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('COMMENT'))
                         else:
                             return_status.append(CFWSDiagnosis('COMMENT'))
-                            # We can't start a comment in the middle of an element,
-                            # so this better be the end
+                            # We can't start a comment in the middle of an
+                            # element, so this better be the end
                             end_or_die = True
 
                         context_stack.append(context)
@@ -367,35 +383,40 @@ class ParserValidator(EmailValidator):
                         if element_len == 0:
                             # Another dot, already? Fatal error
                             if element_count == 0:
-                                return_status.append(InvalidDiagnosis('DOT_START'))
+                                return_status.append(
+                                    InvalidDiagnosis('DOT_START'))
                             else:
-                                return_status.append(InvalidDiagnosis('CONSECUTIVEDOTS'))
+                                return_status.append(
+                                    InvalidDiagnosis('CONSECUTIVEDOTS'))
                         elif hyphen_flag:
                             # Previous subdomain ended in a hyphen. Fatal error
-                            return_status.append(InvalidDiagnosis('DOMAINHYPHENEND'))
+                            return_status.append(
+                                InvalidDiagnosis('DOMAINHYPHENEND'))
                         else:
-                            # Nowhere in RFC 5321 does it say explicitly that the
-                            # domain part of a Mailbox must be a valid domain
-                            # according to the DNS standards set out in RFC 1035,
-                            # but this *is* implied in several places. For
-                            # instance, wherever the idea of host routing is
-                            # discussed the RFC says that the domain must be looked
-                            # up in the DNS. This would be nonsense unless the
-                            # domain was designed to be a valid DNS domain. Hence
-                            # we must conclude that the RFC 1035 restriction on
-                            # label length also applies to RFC 5321 domains.
+                            # Nowhere in RFC 5321 does it say explicitly that
+                            # the domain part of a Mailbox must be a valid
+                            # domain according to the DNS standards set out in
+                            # RFC 1035, but this *is* implied in several places.
+                            # For instance, wherever the idea of host routing is
+                            # discussed the RFC says that the domain must be
+                            # looked up in the DNS. This would be nonsense
+                            # unless the domain was designed to be a valid DNS
+                            # domain. Hence we must conclude that the RFC 1035
+                            # restriction on label length also applies to RFC
+                            # 5321 domains.
                             #
                             # http://tools.ietf.org/html/rfc1035#section-2.3.4
                             # labels         63 octets or less
                             if element_len > 63:
-                                return_status.append(RFC5322Diagnosis('LABEL_TOOLONG'))
+                                return_status.append(
+                                    RFC5322Diagnosis('LABEL_TOOLONG'))
 
                             # CFWS is OK again now we're at the beginning of an
                             # element (although it may be obsolete CFWS)
                             end_or_die = False
                             element_len = 0
                             element_count += 1
-                            atomList[Context.DOMAIN].append('')
+                            atom_list[Context.DOMAIN].append('')
                             parse_data[Context.DOMAIN] += token
                     # Domain literal
                     elif token == Char.OPENSQBRACKET:
@@ -406,30 +427,31 @@ class ParserValidator(EmailValidator):
                             context_stack.append(context)
                             context = Context.LITERAL
                             parse_data[Context.DOMAIN] += token
-                            atomList[Context.DOMAIN][element_count] += token
+                            atom_list[Context.DOMAIN][element_count] += token
                             parse_data['literal'] = ''
                         else:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_ATEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_ATEXT'))
 
                     # Folding White Space (FWS)
                     elif token in [Char.CR, Char.SP, Char.HTAB]:
-                        # TODO: Clean this up!
-                        # Skip simulates the use of ++ operator if the latter check
-                        # doesn't short-circuit
+                        # Skip simulates the use of ++ operator if the latter
+                        # check doesn't short-circuit
                         if token == Char.CR:
                             skip = True
 
-                        if (token == Char.CR and (
-                                        i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF)):
-                            # Fatal error
-                            return_status.append(InvalidDiagnosis('CR_NO_LF'))
-                            break
+                            if i+1 == raw_length or (to_char(address[i + 1]) !=
+                                                     Char.LF):
+                                # Fatal error
+                                return_status.append(
+                                    InvalidDiagnosis('CR_NO_LF'))
+                                break
 
                         if element_len == 0:
                             if element_count == 0:
-                                return_status.append(DeprecatedDiagnosis('CFWS_NEAR_AT'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('CFWS_NEAR_AT'))
                             else:
                                 return_status.append(DeprecatedDiagnosis('FWS'))
                         else:
@@ -446,9 +468,9 @@ class ParserValidator(EmailValidator):
                         # RFC 5322 allows any atext...
                         # http://tools.ietf.org/html/rfc5322#section-3.2.3
                         #    atext  =  ALPHA / DIGIT / ; Printable US-ASCII
-                        #              "!" / "#" /     ; characters not including
-                        #              "$" / "%" /     ; specials.  Used for atoms.
-                        #              "&" / "'" /
+                        #              "!" / "#" /     ; characters not
+                        #              "$" / "%" /     ; including specials.
+                        #              "&" / "'" /     ; Used for atoms.
                         #              "*" / "+" /
                         #              "-" / "/" /
                         #              "=" / "?" /
@@ -467,58 +489,66 @@ class ParserValidator(EmailValidator):
                         #   Ldh-str        = *( ALPHA / DIGIT / "-" ) Let-dig
                         #
                         if end_or_die:
-                            # We have encountered atext where it is no longer valid
+                            # We have encountered atext where it is no longer
+                            # valid
                             if context_prior in [Context.COMMENT, Context.FWS]:
-                                return_status.append(InvalidDiagnosis('ATEXT_AFTER_CFWS'))
+                                return_status.append(
+                                    InvalidDiagnosis('ATEXT_AFTER_CFWS'))
                             elif context_prior == Context.LITERAL:
-                                return_status.append(InvalidDiagnosis('ATEXT_AFTER_DOMLIT'))
-                            else: # pragma: no cover
+                                return_status.append(
+                                    InvalidDiagnosis('ATEXT_AFTER_DOMLIT'))
+                            else:  # pragma: no cover
                                 if diagnose:
                                     return InvalidDiagnosis('BAD_PARSE')
                                 else:
                                     return False
 
                         o = ord(token)
-                        # Assume this token isn't a hyphen unless we discover it is
+                        # Assume this token isn't a hyphen unless we discover
+                        # it is
                         hyphen_flag = False
 
-                        if (o < 33 or o > 126 or token in Char.SPECIALS):
+                        if o < 33 or o > 126 or token in Char.SPECIALS:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_ATEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_ATEXT'))
                         elif token == Char.HYPHEN:
                             if element_len == 0:
-                                # Hyphens can't be at the beginning of a subdomain
+                                # Hyphens can't be at the beginning of a
+                                # subdomain
                                 # Fatal error
-                                return_status.append(InvalidDiagnosis('DOMAINHYPHENSTART'))
+                                return_status.append(
+                                    InvalidDiagnosis('DOMAINHYPHENSTART'))
 
                             hyphen_flag = True
-                        elif not ((o > 47 and o < 58) or
-                                      (o > 64 and o < 91) or
-                                      (o > 96 and o < 123)):
-                            # Not an RFC 5321 subdomain, but still OK by RFC 5322
+                        elif not (47 < o < 58 or 64 < o < 91 or 96 < o < 123):
+                            # Not an RFC 5321 subdomain, but still OK by RFC5322
                             return_status.append(RFC5322Diagnosis('DOMAIN'))
 
                         parse_data[Context.DOMAIN] += token
-                        atomList[Context.DOMAIN][element_count] += token
+                        atom_list[Context.DOMAIN][element_count] += token
                         element_len += 1
                 #--------------------------------------------------------
                 # Domain literal
                 #--------------------------------------------------------
                 elif context == Context.LITERAL:
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
-                    #   domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+                    #   domain-literal = [CFWS]
+                    #                    "[" *([FWS] dtext) [FWS] "]"
+                    #                    [CFWS]
                     #
                     #   dtext          = %d33-90 /     ; Printable US-ASCII
-                    #                    %d94-126 /    ;  characters not including
-                    #                    obs-dtext     ;  "[", "]", or "\"
+                    #                    %d94-126 /    ; characters not
+                    #                    obs-dtext     ; including [, ], or \
                     #
                     #   obs-dtext      = obs-NO-WS-CTL / quoted-pair
 
                     # End of domain literal
                     if token == Char.CLOSESQBRACKET:
-                        if max(return_status) < BaseDiagnosis.CATEGORIES['DEPREC']:
-                            # Could be a valid RFC 5321 address literal, so let's
-                            # check
+                        if (max(return_status) <
+                                BaseDiagnosis.CATEGORIES['DEPREC']):
+                            # Could be a valid RFC 5321 address literal, so
+                            # let's check
                             #
                             # http://tools.ietf.org/html/rfc5321#section-4.1.2
                             #   address-literal  = "[" ( IPv4-address-literal /
@@ -536,15 +566,16 @@ class ParserValidator(EmailValidator):
                             #
                             #   Standardized-tag  = Ldh-str
                             #                     ; Standardized-tag MUST be
-                            #                     ; specified in a Standards-Track
-                            #                     ; RFC and registered with IANA
+                            #                     ; specified in a
+                            #                     ; Standards-Track RFC and
+                            #                     ; registered with IANA
                             #
                             #   dcontent       = %d33-90 / ; Printable US-ASCII
                             #                    %d94-126  ; excl. "[", "\", "]"
                             #
                             #   Snum           = 1*3DIGIT
                             #                  ; representing a decimal integer
-                            #                  ; value in the range 0 through 255
+                            #                  ; value in the range 0-255
                             #
                             #   IPv6-addr      = IPv6-full / IPv6-comp /
                             #                    IPv6v4-full / IPv6v4-comp
@@ -553,126 +584,137 @@ class ParserValidator(EmailValidator):
                             #
                             #   IPv6-full      = IPv6-hex 7(":" IPv6-hex)
                             #
-                            #   IPv6-comp      = [IPv6-hex *5(":" IPv6-hex)] "::"
+                            #   IPv6-comp      = [IPv6-hex *5(":" IPv6-hex)]
+                            #                    "::"
                             #                    [IPv6-hex *5(":" IPv6-hex)]
                             #                  ; The "::" represents at least 2
                             #                  ; 16-bit groups of zeros. No more
-                            #                  ; than 6 groups in addition to the
-                            #                  ; "::" may be present.
+                            #                  ; than 6 groups in addition to
+                            #                  ; the "::" may be present.
                             #
                             #   IPv6v4-full    = IPv6-hex 5(":" IPv6-hex) ":"
                             #                    IPv4-address-literal
                             #
-                            #   IPv6v4-comp    = [IPv6-hex *3(":" IPv6-hex)] "::"
+                            #   IPv6v4-comp    = [IPv6-hex *3(":" IPv6-hex)]
+                            #                    "::"
                             #                    [IPv6-hex *3(":" IPv6-hex) ":"]
                             #                    IPv4-address-literal
                             #                  ; The "::" represents at least 2
-                            #                  ; 16-bit groups of zeros.  No more
-                            #                  ; than 4 groups in addition to the
-                            #                  ; "::" and IPv4-address-literal may
-                            #                  ; be present.
+                            #                  ; 16-bit groups of zeros. No more
+                            #                  ; than 4 groups in addition to
+                            #                  ; the "::" and
+                            #                  ; IPv4-address-literal may be
+                            #                  ; present.
 
                             max_groups = 8
                             index = False
-                            addressLiteral = parse_data['literal']
+                            address_literal = parse_data['literal']
 
-                            # Extract IPv4 part from the end of the address-literal
-                            # (if there is one)
+                            # Extract IPv4 part from the end of the
+                            # address-literal (if there is one)
                             regex = (
                                 r"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.)"
                                 r"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
                             )
-                            matchesIP = re.search(regex, addressLiteral)
-                            if matchesIP:
-                                index = addressLiteral.rfind(matchesIP.group(0))
+                            match_ip = re.search(regex, address_literal)
+                            if match_ip:
+                                index = address_literal.rfind(match_ip.group(0))
                                 if index != 0:
-                                    # Convert IPv4 part to IPv6 format for further
-                                    # testing
-                                    addressLiteral = addressLiteral[0:index] + \
-                                                     '0:0'
+                                    # Convert IPv4 part to IPv6 format for
+                                    # further testing
+                                    address_literal = (
+                                        address_literal[0:index] + '0:0')
 
                             if index == 0 and index is not False:
-                                # Nothing there except a valid IPv4 address, so ...
-                                return_status.append(RFC5321Diagnosis('ADDRESSLITERAL'))
-                            elif not addressLiteral.startswith(Char.IPV6TAG):
-                                return_status.append(RFC5322Diagnosis('DOMAINLITERAL'))
+                                # Nothing there except a valid IPv4 address
+                                return_status.append(
+                                    RFC5321Diagnosis('ADDRESSLITERAL'))
+                            elif not address_literal.startswith(Char.IPV6TAG):
+                                return_status.append(
+                                    RFC5322Diagnosis('DOMAINLITERAL'))
                             else:
-                                IPv6 = addressLiteral[5:]
-                                # Revision 2.7: Daniel Marschall's new IPv6 testing
-                                # strategy
-                                matchesIP = IPv6.split(Char.COLON)
-                                groupCount = len(matchesIP)
-                                index = IPv6.find(Char.DOUBLECOLON)
+                                ipv6 = address_literal[5:]
+                                # Revision 2.7: Daniel Marschall's new IPv6
+                                # testing strategy
+                                match_ip = ipv6.split(Char.COLON)
+                                grp_count = len(match_ip)
+                                index = ipv6.find(Char.DOUBLECOLON)
 
                                 if index == -1:
                                     # we need exactly the right number of groups
-                                    if groupCount != max_groups:
+                                    if grp_count != max_groups:
                                         return_status.append(
                                             RFC5322Diagnosis('IPV6_GRPCOUNT')
                                         )
                                 else:
-                                    if index != IPv6.rfind(Char.DOUBLECOLON):
+                                    if index != ipv6.rfind(Char.DOUBLECOLON):
                                         return_status.append(
                                             RFC5322Diagnosis('IPV6_2X2XCOLON')
                                         )
                                     else:
-                                        if index == 0 or index == len(IPv6) - 2:
+                                        if index == 0 or index == len(ipv6) - 2:
                                             # RFC 4291 allows :: at the start or
-                                            # end of an address with 7 other groups
-                                            # in addition
+                                            # end of an address with 7 other
+                                            # groups in addition
                                             max_groups += 1
 
-                                        if groupCount > max_groups:
+                                        if grp_count > max_groups:
                                             return_status.append(
                                                 RFC5322Diagnosis('IPV6_MAXGRPS')
                                             )
-                                        elif groupCount == max_groups:
+                                        elif grp_count == max_groups:
                                             # Eliding a single "::"
                                             return_status.append(
-                                                RFC5321Diagnosis('IPV6DEPRECATED')
+                                                RFC5321Diagnosis(
+                                                    'IPV6DEPRECATED')
                                             )
 
-                                # Revision 2.7: Daniel Marschall's new IPv6 testing
-                                # strategy
-                                if (IPv6[0] == Char.COLON and IPv6[1] != Char.COLON):
+                                # Revision 2.7: Daniel Marschall's new IPv6
+                                # testing strategy
+                                if (ipv6[0] == Char.COLON and
+                                        ipv6[1] != Char.COLON):
                                     # Address starts with a single colon
-                                    return_status.append(RFC5322Diagnosis('IPV6_COLONSTRT'))
-                                elif (IPv6[-1] == Char.COLON and
-                                              IPv6[-2] != Char.COLON):
+                                    return_status.append(
+                                        RFC5322Diagnosis('IPV6_COLONSTRT'))
+                                elif (ipv6[-1] == Char.COLON and
+                                        ipv6[-2] != Char.COLON):
                                     # Address ends with a single colon
-                                    return_status.append(RFC5322Diagnosis('IPV6_COLONEND'))
+                                    return_status.append(
+                                        RFC5322Diagnosis('IPV6_COLONEND'))
                                 elif ([re.match(r"^[0-9A-Fa-f]{0,4}$", i)
-                                       for i in matchesIP].count(None) != 0):
+                                       for i in match_ip].count(None) != 0):
                                     # Check for unmatched characters
-                                    return_status.append(RFC5322Diagnosis('IPV6_BADCHAR'))
+                                    return_status.append(
+                                        RFC5322Diagnosis('IPV6_BADCHAR'))
                                 else:
-                                    return_status.append(RFC5321Diagnosis('ADDRESSLITERAL'))
+                                    return_status.append(
+                                        RFC5321Diagnosis('ADDRESSLITERAL'))
                         else:
-                            return_status.append(RFC5322Diagnosis('DOMAINLITERAL'))
+                            return_status.append(
+                                RFC5322Diagnosis('DOMAINLITERAL'))
 
                         parse_data[Context.DOMAIN] += token
-                        atomList[Context.DOMAIN][element_count] += token
+                        atom_list[Context.DOMAIN][element_count] += token
                         element_len += 1
                         context_prior = context
                         context = context_stack.pop()
                     elif token == Char.BACKSLASH:
-                        return_status.append(RFC5322Diagnosis('DOMLIT_OBSDTEXT'))
+                        return_status.append(
+                            RFC5322Diagnosis('DOMLIT_OBSDTEXT'))
                         context_stack.append(context)
                         context = Context.QUOTEDPAIR
                     # Folding White Space (FWS)
                     elif token in [Char.CR, Char.SP, Char.HTAB]:
-                        # TODO: Clean this up!
-                        # Skip simulates the use of ++ operator if the latter check
-                        # doesn't short-circuit
+                        # Skip simulates the use of ++ operator if the latter
+                        # check doesn't short-circuit
                         if token == Char.CR:
                             skip = True
 
-                        if (token == Char.CR and (
-                                        i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF)):
-                            # Fatal error
-                            return_status.append(InvalidDiagnosis('CR_NO_LF'))
-                            break
+                            if (i+1 == raw_length or
+                                    to_char(address[i+1]) != Char.LF):
+                                return_status.append(
+                                    InvalidDiagnosis('CR_NO_LF'))
+                                break
 
                         return_status.append(CFWSDiagnosis('FWS'))
 
@@ -683,73 +725,74 @@ class ParserValidator(EmailValidator):
                     else:
                         # http://tools.ietf.org/html/rfc5322#section-3.4.1
                         #   dtext         = %d33-90 /   ; Printable US-ASCII
-                        #                   %d94-126 /  ;  characters not including
-                        #                   obs-dtext   ;  "[", "]", or "\"
+                        #                   %d94-126 /  ; characters not
+                        #                   obs-dtext   ; including [, ], or \
                         #
                         #   obs-dtext     = obs-NO-WS-CTL / quoted-pair
                         #
                         #   obs-NO-WS-CTL = %d1-8 /     ; US-ASCII control
-                        #                   %d11 /      ;  characters that do not
-                        #                   %d12 /      ;  include the carriage
-                        #                   %d14-31 /   ;  return, line feed, and
-                        #                   %d127       ;  white space characters
+                        #                   %d11 /      ; characters that do not
+                        #                   %d12 /      ; include the carriage
+                        #                   %d14-31 /   ; return, line feed, and
+                        #                   %d127       ; white space characters
                         o = ord(token)
 
                         # CR, LF, SP & HTAB have already been parsed above
-                        if (o > 127 or o == 0 or token == Char.OPENSQBRACKET):
+                        if o > 127 or o == 0 or token == Char.OPENSQBRACKET:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_DTEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_DTEXT'))
                             break
                         elif o < 33 or o == 127:
-                            return_status.append(RFC5322Diagnosis('DOMLIT_OBSDTEXT'))
+                            return_status.append(
+                                RFC5322Diagnosis('DOMLIT_OBSDTEXT'))
 
                         parse_data['literal'] += token
                         parse_data[Context.DOMAIN] += token
-                        atomList[Context.DOMAIN][element_count] += token
+                        atom_list[Context.DOMAIN][element_count] += token
                         element_len += 1
                 #--------------------------------------------------------
                 # Quoted string
                 #--------------------------------------------------------
                 elif context == Context.QUOTEDSTRING:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.4
-                    #   quoted-string   =   [CFWS]
-                    #                       DQUOTE *([FWS] qcontent) [FWS] DQUOTE
-                    #                       [CFWS]
+                    #   quoted-string   =  [CFWS]
+                    #                      DQUOTE *([FWS] qcontent) [FWS] DQUOTE
+                    #                      [CFWS]
                     #
-                    #   qcontent        =   qtext / quoted-pair
+                    #   qcontent        =  qtext / quoted-pair
 
                     # Quoted pair
                     if token == Char.BACKSLASH:
                         context_stack.append(context)
                         context = Context.QUOTEDPAIR
-                    # Foloing White Space (FWS)
+                    # Folding White Space (FWS)
                     # Inside a quoted string, spaces are allow as regular
                     # characters. It's only FWS if we include HTAB or CRLF
                     elif token in [Char.CR, Char.HTAB]:
-                        # TODO: Clean this up!
-                        # Skip simulates the use of ++ operator if the latter check
-                        # doesn't short-circuit
+                        # Skip simulates the use of ++ operator if the latter
+                        # check doesn't short-circuit
                         if token == Char.CR:
                             skip = True
 
-                        if (token == Char.CR and (
-                                        i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF)):
-                            # Fatal error
-                            return_status.append(InvalidDiagnosis('CR_NO_LF'))
-                            break
+                            if (i+1 == raw_length or
+                                    to_char(address[i+1]) != Char.LF):
+                                return_status.append(
+                                    InvalidDiagnosis('CR_NO_LF'))
+                                break
 
                         # http://tools.ietf.org/html/rfc5322#section-3.2.2
                         #   Runs of FWS, comment, or CFWS that occur between
                         #   lexical tokens in a structured header field are
-                        #   semantically interpreted as a single space character.
+                        #   semantically interpreted as a single space
+                        #   character.
 
                         # http://tools.ietf.org/html/rfc5322#section-3.2.4
-                        #   the CRLF in any FWS/CFWS that appears within the quoted
-                        #   string [is] semantically "invisible" and therefore not
-                        #   part of the quoted-string
+                        #   the CRLF in any FWS/CFWS that appears within the
+                        #   quoted string [is] semantically "invisible" and
+                        #   therefore not part of the quoted-string
                         parse_data[Context.LOCALPART] += Char.SP
-                        atomList[Context.LOCALPART][element_count] += Char.SP
+                        atom_list[Context.LOCALPART][element_count] += Char.SP
                         element_len += 1
 
                         return_status.append(CFWSDiagnosis('FWS'))
@@ -759,7 +802,7 @@ class ParserValidator(EmailValidator):
                     # End of quoted string
                     elif token == Char.DQUOTE:
                         parse_data[Context.LOCALPART] += token
-                        atomList[Context.LOCALPART][element_count] += token
+                        atom_list[Context.LOCALPART][element_count] += token
                         element_len += 1
                         context_prior = context
                         context = context_stack.pop()
@@ -767,36 +810,38 @@ class ParserValidator(EmailValidator):
                     else:
                         # http://tools.ietf.org/html/rfc5322#section-3.2.4
                         #   qtext          =  %d33 /      ; Printable US-ASCII
-                        #                     %d35-91 /   ;  characters not
-                        #                     %d93-126 /  ;  including "\" or the
-                        #                     obs-qtext   ;  quote character
+                        #                     %d35-91 /   ; characters not
+                        #                     %d93-126 /  ; including "\" or the
+                        #                     obs-qtext   ; quote character
                         #
                         #   obs-qtext      =  obs-NO-WS-CTL
                         #
                         #   obs-NO-WS-CTL  =  %d1-8 /     ; US-ASCII control
-                        #                     %d11 /      ;  characters that do not
-                        #                     %d12 /      ;  include the carriage
-                        #                     %d14-31 /   ;  return, line feed, and
-                        #                     %d127       ;  white space characters
+                        #                     %d11 /      ; characters that do
+                        #                     %d12 /      ; not include the CR,
+                        #                     %d14-31 /   ; LF, and white space
+                        #                     %d127       ; characters
                         o = ord(token)
 
                         if o > 127 or o == 0 or o == 10:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_QTEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_QTEXT'))
                         elif o < 32 or o == 127:
-                            return_status.append(DeprecatedDiagnosis('QTEXT'))
+                            return_status.append(
+                                DeprecatedDiagnosis('QTEXT'))
 
                         parse_data[Context.LOCALPART] += token
-                        atomList[Context.LOCALPART][element_count] += token
+                        atom_list[Context.LOCALPART][element_count] += token
                         element_len += 1
 
                         # TODO
                         # http://tools.ietf.org/html/rfc5322#section-3.4.1
-                        #   If the string can be represented as a dot-atom (that is, it
-                        #   contains no characters other than atext characters or "."
-                        #   surrounded by atext characters), then the dot-atom form
-                        #   SHOULD be used and the quoted-string form SHOULD NOT be
-                        #   used.
+                        #   If the string can be represented as a dot-atom (that
+                        #   is, it contains no characters other than atext
+                        #   characters or "." surrounded by atext characters),
+                        #   then the dot-atom form SHOULD be used and the
+                        #   quoted-string form SHOULD NOT be used.
 
                 #--------------------------------------------------------
                 # Quoted pair
@@ -824,7 +869,8 @@ class ParserValidator(EmailValidator):
 
                     if o > 127:
                         # Fatal error
-                        return_status.append(InvalidDiagnosis('EXPECTING_QPAIR'))
+                        return_status.append(
+                            InvalidDiagnosis('EXPECTING_QPAIR'))
                     elif (o < 31 and o != 9) or o == 127:
                         # SP & HTAB are allowed
                         return_status.append(DeprecatedDiagnosis('QP'))
@@ -835,9 +881,6 @@ class ParserValidator(EmailValidator):
                     # http://tools.ietf.org/html/rfc5321#section-4.1.2
                     #   the sending system SHOULD transmit the
                     #   form that uses the minimum quoting possible.
-                    # TODO: check whether the character needs to be quoted
-                    #       (escaped) in this context
-
                     context_prior = context
                     context = context_stack.pop()   # End of qpair
                     token = Char.BACKSLASH + token
@@ -846,21 +889,21 @@ class ParserValidator(EmailValidator):
                         pass
                     elif context == Context.QUOTEDSTRING:
                         parse_data[Context.LOCALPART] += token
-                        atomList[Context.LOCALPART][element_count] += token
-                        # The maximum sizes specified by RFC 5321 are octet counts,
-                        # so we must include the backslash
+                        atom_list[Context.LOCALPART][element_count] += token
+                        # The maximum sizes specified by RFC 5321 are octet
+                        # counts, so we must include the backslash
                         element_len += 2
                     elif context == Context.LITERAL:
                         parse_data[Context.DOMAIN] += token
-                        atomList[Context.DOMAIN][element_count] += token
-                        # The maximum sizes specified by RFC 5321 are octet counts,
-                        # so we must include the backslash
+                        atom_list[Context.DOMAIN][element_count] += token
+                        # The maximum sizes specified by RFC 5321 are octet
+                        # counts, so we must include the backslash
                         element_len += 2
-                    else:
-                        SystemExit(
-                            ("Quoted pair logic invoked in an invalid "
-                             "context: %s" % context))
-
+                    else:  # pragma: no cover
+                        if diagnose:
+                            return InvalidDiagnosis('BAD_PARSE')
+                        else:
+                            return False
                 #--------------------------------------------------------
                 # Comment
                 #--------------------------------------------------------
@@ -879,41 +922,22 @@ class ParserValidator(EmailValidator):
                     elif token == Char.CLOSEPARENTHESIS:
                         context_prior = context
                         context = context_stack.pop()
-
-                        # http://tools.ietf.org/html/rfc5322#section-3.2.2
-                        #   Runs of FWS, comment, or CFWS that occur between
-                        #   lexical tokens in a structured header field are
-                        #   semantically interpreted as a single space character.
-                        #
-                        # is_email() author's note: This *cannot* mean that we must
-                        # add a space to the address wherever CFWS appears. This
-                        # would result in any addr-spec that had CFWS outside a
-                        # quoted string being invalid for RFC 5321.
-
-                        # if context in [Context.LOCALPART, Context.DOMAIN]:
-                        #    parse_data[context] += Char.SP
-                        #    atomList[context][element_count] += Char.SP
-                        #    element_len += 1
                     # Quoted pair
                     elif token == Char.BACKSLASH:
                         context_stack.append(context)
                         context = Context.QUOTEDPAIR
                     # Folding White Space (FWS)
-                    elif token in [Char.CR, Char.SP,
-                                   Char.HTAB]:
-
-                        # TODO: Clean this up!
-                        # Skip simulates the use of ++ operator if the latter check
-                        # doesn't short-circuit
+                    elif token in [Char.CR, Char.SP, Char.HTAB]:
+                        # Skip simulates the use of ++ operator if the latter
+                        # check doesn't short-circuit
                         if token == Char.CR:
                             skip = True
 
-                        if token == Char.CR and (
-                                        i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF):
-                            # Fatal error
-                            return_status.append(InvalidDiagnosis('CR_NO_LF'))
-                            break
+                            if (i+1 == raw_length or
+                                    to_char(address[i+1]) != Char.LF):
+                                return_status.append(
+                                    InvalidDiagnosis('CR_NO_LF'))
+                                break
 
                         return_status.append(CFWSDiagnosis('FWS'))
 
@@ -924,25 +948,25 @@ class ParserValidator(EmailValidator):
                     else:
                         # http://tools.ietf.org/html/rfc5322#section-3.2.3
                         #   ctext           =   %d33-39 /   ; Printable US-ASCII
-                        #                       %d42-91 /   ;  characters not
-                        #                       %d93-126 /  ;  including "(", ")",
-                        #                       obs-ctext   ;  or "\"
+                        #                       %d42-91 /   ; characters not
+                        #                       %d93-126 /  ; including (, ),
+                        #                       obs-ctext   ; or \
                         #
                         #   obs-ctext       =   obs-NO-WS-CTL
                         #
                         #   obs-NO-WS-CTL   =   %d1-8 /      ; US-ASCII control
-                        #                       %d11 /       ;  characters that do
-                        #                       %d12 /       ;  not include the
-                        #                       %d14-31 /    ;  carriage return,
-                        #                       %d127        ;  line feed, and
-                        #                                    ;  white space
-                        #                                    ;  characters
+                        #                       %d11 /       ; characters that
+                        #                       %d12 /       ; do not include
+                        #                       %d14-31 /    ; the CR, LF, and
+                        #                                    ; white space
+                        #                                    ; characters
 
                         o = ord(token)
 
                         if o > 127 or o == 0 or o == 10:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('EXPECTING_CTEXT'))
+                            return_status.append(
+                                InvalidDiagnosis('EXPECTING_CTEXT'))
                             break
                         elif o < 32 or o == 127:
                             return_status.append(DeprecatedDiagnosis('CTEXT'))
@@ -957,43 +981,47 @@ class ParserValidator(EmailValidator):
                     #
                     # But note the erratum:
                     # http://www.rfc-editor.org/errata_search.php?rfc=5322&eid=1908
-                    #   In the obsolete syntax, any amount of folding white space
-                    #   MAY be inserted where the obs-FWS rule is allowed.  This
-                    #   creates the possibility of having two consecutive "folds"
-                    #   in a line, and therefore the possibility that a line which
-                    #   makes up a folded header field could be composed entirely
-                    #   of white space.
+                    #   In the obsolete syntax, any amount of folding white
+                    #   space MAY be inserted where the obs-FWS rule is allowed.
+                    #   This creates the possibility of having two consecutive
+                    #   "folds" in a line, and therefore the possibility that a
+                    #   line which makes up a folded header field could be
+                    #   composed entirely of white space.
                     #
                     #   obs-FWS         =   1*([CRLF] WSP)
 
                     if token_prior == Char.CR:
                         if token == Char.CR:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('FWS_CRLF_X2'))
+                            return_status.append(
+                                InvalidDiagnosis('FWS_CRLF_X2'))
                             break
 
                         if crlf_count != -1:
                             crlf_count += 1
                             if crlf_count > 1:
                                 # Multiple folds = obsolete FWS
-                                return_status.append(DeprecatedDiagnosis('FWS'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('FWS'))
                         else:
                             crlf_count = 1
 
+                    # Skip simulates the use of ++ operator if the latter
+                    # check doesn't short-circuit
                     if token == Char.CR:
-                        # Skip simulates the use of ++ operator
                         skip = True
 
-                        if (i + 1 == raw_length or
-                                    to_char(address[i + 1]) != Char.LF):
-                            # Fatal error
+                        if (i+1 == raw_length or
+                                to_char(address[i+1]) != Char.LF):
                             return_status.append(InvalidDiagnosis('CR_NO_LF'))
+                            break
                     elif token in [Char.SP, Char.HTAB]:
                         pass
                     else:
                         if token_prior == Char.CR:
                             # Fatal error
-                            return_status.append(InvalidDiagnosis('FWS_CRLF_END'))
+                            return_status.append(
+                                InvalidDiagnosis('FWS_CRLF_END'))
                             break
 
                         if crlf_count != -1:
@@ -1003,21 +1031,6 @@ class ParserValidator(EmailValidator):
                         # End of FWS
                         context = context_stack.pop()
 
-                        # http://tools.ietf.org/html/rfc5322#section-3.2.2
-                        #   Runs of FWS, comment, or CFWS that occur between
-                        #   lexical tokens in a structured header field are
-                        #   semantically interpreted as a single space character.
-                        #
-                        # is_email() author's note: This *cannot* mean that we must
-                        # add a space to the address wherever CFWS appears. This
-                        # would result in any addr-spec that had CFWS outside a
-                        # quoted string being invalid for RFC 5321.
-
-                        # if context in [Context.LOCALPART, Context.DOMAIN]:
-                        #    parse_data[context] += Char.SP
-                        #    atomList[context][element_count] += Char.SP
-                        #    element_len += 1
-
                         # Look at this token again in the parent context
                         repeat = True
 
@@ -1026,8 +1039,11 @@ class ParserValidator(EmailValidator):
                 #--------------------------------------------------------
                 # A context we aren't expecting
                 #--------------------------------------------------------
-                else:
-                    SystemExit("Unknown context: %s" % context)
+                else:  # pragma: no cover
+                    if diagnose:
+                        return InvalidDiagnosis('BAD_PARSE')
+                    else:
+                        return False
 
             # No point in going on if we've got a fatal error
             if max(return_status) > BaseDiagnosis.CATEGORIES['RFC5322']:
@@ -1060,7 +1076,7 @@ class ParserValidator(EmailValidator):
                 # Fatal error
                 return_status.append(InvalidDiagnosis('DOMAINHYPHENEND'))
             # http://tools.ietf.org/html/rfc5321#section-4.5.3.1.2
-            #   The maximum total length of a domain name or number is 255 octets.
+            # The maximum total length of a domain name or number is 255 octets.
             elif len(parse_data[Context.DOMAIN]) > 255:
                 return_status.append(RFC5322Diagnosis('DOMAIN_TOOLONG'))
             # http://tools.ietf.org/html/rfc5321#section-4.1.2
@@ -1069,8 +1085,8 @@ class ParserValidator(EmailValidator):
             #   Path           = "<" [ A-d-l ":" ] Mailbox ">"
             #
             # http://tools.ietf.org/html/rfc5321#section-4.5.3.1.3
-            #   The maximum total length of a reverse-path or forward-path is 256
-            #   octets (including the punctuation and element separators).
+            #   The maximum total length of a reverse-path or forward-path is
+            #   256 octets (including the punctuation and element separators).
             #
             # Thus, even without (obsolete) routing information, the Mailbox can
             # only be 254 characters long. This is confirmed by this verified
@@ -1079,10 +1095,11 @@ class ParserValidator(EmailValidator):
             # http://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1690
             #   However, there is a restriction in RFC 2821 on the length of an
             #   address in MAIL and RCPT commands of 254 characters.  Since
-            #   addresses that do not fit in those fields are not normally useful,
-            #   the upper limit on address lengths should normally be considered to
-            #   be 254.
-            elif len(parse_data[Context.LOCALPART] + Char.AT + parse_data[Context.DOMAIN]) > 254:
+            #   addresses that do not fit in those fields are not normally
+            #   useful, the upper limit on address lengths should normally be
+            #   considered to be 254.
+            elif len(parse_data[Context.LOCALPART] + Char.AT +
+                     parse_data[Context.DOMAIN]) > 254:
                 return_status.append(RFC5322Diagnosis('TOOLONG'))
             # http://tools.ietf.org/html/rfc1035#section-2.3.4
             # labels           63 octets or less
@@ -1101,4 +1118,11 @@ class ParserValidator(EmailValidator):
         if final_status < threshold:
             final_status = ValidDiagnosis()
 
-        return final_status if diagnose else final_status < BaseDiagnosis.CATEGORIES['THRESHOLD']
+        if diagnose:
+            return final_status
+        else:
+            return final_status < BaseDiagnosis.CATEGORIES['THRESHOLD']
+
+if __name__ == '__main__':
+    v = ParserValidator()
+    print v.is_email("test@iana.org&#x240D;&#x240A;", True)
