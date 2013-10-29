@@ -33,7 +33,7 @@ class DNSValidator(object):
             dns_checked = True
         except dns.name.NameTooLong:
             # This shouldn't happen because we've already validated the length
-            pass
+            return_status.append(DNSDiagnosis('NO_RECORD'))
         except dns.resolver.NXDOMAIN:
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis('NO_RECORD'))
