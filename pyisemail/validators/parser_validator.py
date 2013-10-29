@@ -1099,8 +1099,3 @@ class ParserValidator(EmailValidator):
             final_status = ValidDiagnosis()
 
         return final_status if diagnose else final_status < BaseDiagnosis.CATEGORIES['THRESHOLD']
-
-if __name__ == '__main__':
-    v = ParserValidator()
-
-    print v.is_email("test@io", True)
