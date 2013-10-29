@@ -6,7 +6,7 @@ class DNSValidator(object):
 
     def is_valid(self, domain, diagnose=False):
 
-        return_status = []
+        return_status = [ValidDiagnosis()]
         dns_checked = False
 
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
