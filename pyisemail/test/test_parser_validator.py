@@ -1,20 +1,17 @@
-__author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2013 Michael Herold"
-__license__ = "MIT"
-
+import os
 import xml.etree.ElementTree as ET
 from testscenarios import TestWithScenarios
-from pyisemail.validators import ParserValidator
 from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis, BaseDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
 from pyisemail.diagnosis import DNSDiagnosis
+from pyisemail.validators import ParserValidator
 
 
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
 
-    document = ET.parse('pyisemail/test/data/tests.xml')
+    document = ET.parse("%s/data/tests.xml" % os.path.dirname(__file__))
     root = document.getroot()
 
     scenarios = []
@@ -66,7 +63,7 @@ def get_diagnosis_class(tag):
     return d_class
 
 
-def get_expected_diagnosis(tag):
+def create_diagnosis(tag):
 
     split_tag = tag.split("_")
     d_class = get_diagnosis_class(split_tag[1])
@@ -80,13 +77,14 @@ def get_expected_diagnosis(tag):
 class ParserValidatorTest(TestWithScenarios):
 
     scenarios = get_scenarios()
+    threshold = BaseDiagnosis.CATEGORIES['THRESHOLD']
 
     def test_without_diagnosis(self):
 
         v = ParserValidator()
 
         result = v.is_email(self.address)
-        expected = get_expected_diagnosis(self.diagnosis) < BaseDiagnosis.CATEGORIES['THRESHOLD']
+        expected = create_diagnosis(self.diagnosis) < self.threshold
 
         self.assertEqual(
             result,
@@ -100,7 +98,7 @@ class ParserValidatorTest(TestWithScenarios):
         v = ParserValidator()
 
         result = v.is_email(self.address, True)
-        expected = get_expected_diagnosis(self.diagnosis)
+        expected = create_diagnosis(self.diagnosis)
 
         self.assertEqual(
             result,

@@ -1,21 +1,17 @@
-from pyisemail.validators.dns_validator import DNSValidator
-
-__author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2013 Michael Herold"
-__license__ = "MIT"
-
+import os
 import xml.etree.ElementTree as ET
 from testscenarios import TestWithScenarios
 from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
 from pyisemail.diagnosis import DNSDiagnosis
+from pyisemail.validators.dns_validator import DNSValidator
 
 
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
 
-    document = ET.parse('pyisemail/test/data/dns-tests.xml')
+    document = ET.parse("%s/data/dns-tests.xml" % os.path.dirname(__file__))
     root = document.getroot()
 
     scenarios = []
@@ -67,7 +63,7 @@ def get_diagnosis_class(tag):
     return d_class
 
 
-def get_expected_diagnosis(tag):
+def create_diagnosis(tag):
 
     split_tag = tag.split("_")
     d_class = get_diagnosis_class(split_tag[1])
@@ -88,7 +84,7 @@ class DNSValidatorTest(TestWithScenarios):
 
         domain = self.address.split("@")[1]
         result = v.is_valid(domain)
-        expected = get_expected_diagnosis(self.diagnosis) == ValidDiagnosis()
+        expected = create_diagnosis(self.diagnosis) == ValidDiagnosis()
 
         self.assertEqual(
             result,
@@ -103,7 +99,7 @@ class DNSValidatorTest(TestWithScenarios):
 
         domain = self.address.split("@")[1]
         result = v.is_valid(domain, True)
-        expected = get_expected_diagnosis(self.diagnosis)
+        expected = create_diagnosis(self.diagnosis)
 
         self.assertEqual(
             result,
