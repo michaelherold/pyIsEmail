@@ -1,0 +1,2 @@
+dnspython>=1.10.0
+pyparsing>=2.0.1
