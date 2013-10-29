@@ -5,6 +5,6 @@ install:
   - pip install -r requirements.txt --use-mirrors
   - pip install coveralls --use-mirrors
 script:
-  - coverage run setup.py test
+  - coverage run setup.py -q test
 after_success:
   - coveralls
