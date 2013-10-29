@@ -1,1 +1,2 @@
+from pyisemail.validators.dns_validator import DNSValidator
 from pyisemail.validators.parser_validator import ParserValidator
