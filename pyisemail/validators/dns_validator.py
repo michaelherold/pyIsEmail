@@ -31,10 +31,7 @@ class DNSValidator(object):
         try:
             dns.resolver.query(domain, 'MX')
             dns_checked = True
-        except dns.name.NameTooLong:
-            # This shouldn't happen because we've already validated the length
-            return_status.append(DNSDiagnosis('NO_RECORD'))
-        except dns.resolver.NXDOMAIN:
+        except dns.resolver.NXDOMAIN, dns.name.NameTooLong:
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis('NO_RECORD'))
         except dns.resolver.NoAnswer:
@@ -80,7 +77,7 @@ class DNSValidator(object):
         #   However, a valid host name can never have the dotted-decimal
         #   form #.#.#.#, since this change does not permit the highest-level
         #   component label to start with a digit even if it is not all-numeric.
-        if not dns_checked and max(return_status) < BaseDiagnosis.CATEGORIES['DNSWARN']:
+        if not dns_checked:
             atom_list = domain.split(".")
             if len(atom_list) == 1:
                 return_status.append(RFC5321Diagnosis('TLD'))

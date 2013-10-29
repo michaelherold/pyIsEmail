@@ -43,20 +43,12 @@ def get_node_text(text):
 
 def get_diagnosis_class(tag):
 
-    if tag == "ERR":
-        d_class = InvalidDiagnosis
-    elif tag == "DNSWARN":
+    if tag == "DNSWARN":
         d_class = DNSDiagnosis
     elif tag == "VALID":
         d_class = ValidDiagnosis
     elif tag == "RFC5321":
         d_class = RFC5321Diagnosis
-    elif tag == "RFC5322":
-        d_class = RFC5322Diagnosis
-    elif tag == "CFWS":
-        d_class = CFWSDiagnosis
-    elif tag == "DEPREC":
-        d_class = DeprecatedDiagnosis
     else:
         d_class = ""
 

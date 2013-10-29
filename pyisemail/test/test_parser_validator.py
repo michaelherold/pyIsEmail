@@ -4,7 +4,6 @@ from testscenarios import TestWithScenarios
 from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis, BaseDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
-from pyisemail.diagnosis import DNSDiagnosis
 from pyisemail.validators import ParserValidator
 
 
@@ -45,8 +44,6 @@ def get_diagnosis_class(tag):
 
     if tag == "ERR":
         d_class = InvalidDiagnosis
-    elif tag == "DNSWARN":
-        d_class = DNSDiagnosis
     elif tag == "VALID":
         d_class = ValidDiagnosis
     elif tag == "RFC5321":
