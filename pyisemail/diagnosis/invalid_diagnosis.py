@@ -27,6 +27,7 @@ class InvalidDiagnosis(BaseDiagnosis):
         'FWS_CRLF_X2': 148,
         'FWS_CRLF_END': 149,
         'CR_NO_LF': 150,
+        'BAD_PARSE': 151,
     }
 
     MESSAGES = {
@@ -66,6 +67,7 @@ class InvalidDiagnosis(BaseDiagnosis):
                          "that ends with a CRLF sequence."),
         'CR_NO_LF': ("Address contains a carriage return "
                      "that is not followed by a line return."),
+        'BAD_PARSE': "Address is malformed.",
     }
 
     REFERENCES = {
@@ -90,5 +92,6 @@ class InvalidDiagnosis(BaseDiagnosis):
         'UNCLOSEDDOMLIT': ['domain-literal'],
         'FWS_CRLF_X2': ['CFWS'],
         'FWS_CRLF_END': ['CFWS'],
-        'CR_NO_LF': ['CFWS', 'CRLF']
+        'CR_NO_LF': ['CFWS', 'CRLF'],
+        'BAD_PARSE': [],
     }

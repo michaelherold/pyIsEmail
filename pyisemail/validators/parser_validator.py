@@ -222,8 +222,11 @@ class ParserValidator(EmailValidator):
                     # @
                     elif token == Char.AT:
                         # At this point we should have a valid local-part
-                        if len(context_stack) != 1:
-                            raise SystemExit("Unexpected item on context stack")
+                        if len(context_stack) != 1: # pragma: no cover
+                                if diagnose:
+                                    return InvalidDiagnosis('BAD_PARSE')
+                                else:
+                                    return False
 
                         if parse_data[Context.LOCALPART] == '':
                             # Fatal error
@@ -278,11 +281,11 @@ class ParserValidator(EmailValidator):
                                 return_status.append(InvalidDiagnosis('ATEXT_AFTER_CFWS'))
                             elif context_prior == Context.QUOTEDSTRING:
                                 return_status.append(InvalidDiagnosis('ATEXT_AFTER_QS'))
-                            else:
-                                raise SystemExit(
-                                    ("More atext found where none is allowed, "
-                                     "but unrecognized prior context: %s" %
-                                     context_prior))
+                            else: # pragma: no cover
+                                if diagnose:
+                                    return InvalidDiagnosis('BAD_PARSE')
+                                else:
+                                    return False
                         else:
                             context_prior = context
                             o = ord(token)
@@ -469,11 +472,11 @@ class ParserValidator(EmailValidator):
                                 return_status.append(InvalidDiagnosis('ATEXT_AFTER_CFWS'))
                             elif context_prior == Context.LITERAL:
                                 return_status.append(InvalidDiagnosis('ATEXT_AFTER_DOMLIT'))
-                            else:
-                                raise SystemExit(
-                                    ("More atext found where none is allowed, but"
-                                     "unrecognised prior context: %s" %
-                                     context_prior))
+                            else: # pragma: no cover
+                                if diagnose:
+                                    return InvalidDiagnosis('BAD_PARSE')
+                                else:
+                                    return False
 
                         o = ord(token)
                         # Assume this token isn't a hyphen unless we discover it is
