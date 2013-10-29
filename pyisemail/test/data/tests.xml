@@ -122,22 +122,6 @@ Date       Tests        Version Notes
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
     <valid>True</valid>
   </test>
-  <test id="12">
-    <address>test@e.com</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
-  </test>
-  <test id="13">
-    <address>test@iana.a</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
-  </test>
   <test id="14">
     <address>test.test@iana.org</address>
     <category>ISEMAIL_VALID_CATEGORY</category>
@@ -210,22 +194,6 @@ Date       Tests        Version Notes
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
     <valid>True</valid>
   </test>
-  <test id="23">
-    <address>test@iana.123</address>
-    <category>ISEMAIL_RFC5321</category>
-    <diagnosis>ISEMAIL_RFC5321_TLDNUMERIC</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>False</valid>
-  </test>
-  <test id="24">
-    <address>test@255.255.255.255</address>
-    <category>ISEMAIL_RFC5321</category>
-    <diagnosis>ISEMAIL_RFC5321_TLDNUMERIC</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>False</valid>
-  </test>
   <test id="25">
     <address>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghiklm@iana.org</address>
     <category>ISEMAIL_VALID_CATEGORY</category>
@@ -241,14 +209,6 @@ Date       Tests        Version Notes
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
     <valid>False</valid>
-  </test>
-  <test id="27">
-    <address>test@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.com</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
   </test>
   <test id="28">
     <address>test@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghiklm.com</address>
@@ -290,14 +250,6 @@ Date       Tests        Version Notes
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
     <valid>True</valid>
   </test>
-  <test id="33">
-    <address>test@iana.co-uk</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
-  </test>
   <test id="34">
     <address>test@.iana.org</address>
     <category>ISEMAIL_ERR</category>
@@ -321,22 +273,6 @@ Date       Tests        Version Notes
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
     <valid>False</valid>
-  </test>
-  <test id="37">
-    <address>a@a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
-  </test>
-  <test id="38">
-    <address>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghiklm@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghi</address>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Michael Rushton</source>
-    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    <valid>True</valid>
   </test>
   <test id="39">
     <address>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghiklm@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghij</address>
@@ -1355,31 +1291,5 @@ Date       Tests        Version Notes
     <source>Dominic Sayers</source>
     <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
     <valid>False</valid>
-  </test>
-  <test id="166">
-    <address>test@org</address>
-    <category>ISEMAIL_RFC5321</category>
-    <diagnosis>ISEMAIL_RFC5321_TLD</diagnosis>
-    <source>Dominic Sayers</source>
-    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
-    <valid>False</valid>
-  </test>
-  <test id="167">
-    <address>test@test.com</address>
-    <comment>test.com has an A-record but not an MX-record</comment>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_MX_RECORD</diagnosis>
-    <source>Dominic Sayers</source>
-    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
-    <valid>True</valid>
-  </test>
-  <test id="168">
-    <address>test@nic.no</address>
-    <comment>nic.no currently has no MX-records or A-records (Feb 2011). If you are seeing an A-record for nic.io then try setting your DNS server to 8.8.8.8 (the Google DNS server) - your DNS server may be faking an A-record (OpenDNS does this, for instance).</comment>
-    <category>ISEMAIL_DNSWARN</category>
-    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
-    <source>Dominic Sayers</source>
-    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
-    <valid>True</valid>
   </test>
 </tests>

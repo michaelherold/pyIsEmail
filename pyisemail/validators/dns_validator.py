@@ -28,12 +28,6 @@ class DNSValidator(object):
         # reasons we will not repeat the DNS lookup for the CNAME's target, but
         # we will raise a warning because we didn't immediately find an MX
         # record.
-
-        # Checking TLD DNS seems to work only if you explicitly check for the
-        # root
-        if len(domain.split(".")) == 1:
-            domain += '.'
-
         try:
             dns.resolver.query(domain, 'MX')
             dns_checked = True
@@ -89,7 +83,7 @@ class DNSValidator(object):
                 return_status.append(RFC5321Diagnosis('TLD'))
 
             try:
-                float(atom_list[len(atom_list)][0])
+                float(atom_list[len(atom_list)-1][0])
                 return_status.append(RFC5321Diagnosis('TLDNUMERIC'))
             except ValueError:
                 pass
@@ -98,3 +92,7 @@ class DNSValidator(object):
             return ValidDiagnosis() if diagnose is True else True
         else:
             return max(return_status) if diagnose is True else False
+
+if __name__ == '__main__':
+    v = DNSValidator()
+    print v.is_valid("e.com")
