@@ -5,7 +5,7 @@ __license__ = "MIT"
 import xml.etree.ElementTree as ET
 from testscenarios import TestWithScenarios
 from pyisemail.validators import ParserValidator
-from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis
+from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis, BaseDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
 from pyisemail.diagnosis import DNSDiagnosis
@@ -26,11 +26,6 @@ def get_scenarios():
         attrs['id'] = str(test.attrib['id'])
         attrs['address'] = get_node_text(test.find('address').text)
         attrs['diagnosis'] = get_node_text(test.find('diagnosis').text)
-        validity = get_node_text(test.find('valid').text)
-        if validity == 'True':
-            attrs['valid'] = True
-        else:
-            attrs['valid'] = False
 
         scenario = (id, attrs)
 
@@ -91,7 +86,7 @@ class ParserValidatorTest(TestWithScenarios):
         v = ParserValidator()
 
         result = v.is_email(self.address)
-        expected = self.valid
+        expected = get_expected_diagnosis(self.diagnosis) < BaseDiagnosis.CATEGORIES['THRESHOLD']
 
         self.assertEqual(
             result,
@@ -105,8 +100,7 @@ class ParserValidatorTest(TestWithScenarios):
         v = ParserValidator()
 
         result = v.is_email(self.address, True)
-        result = (result == ValidDiagnosis(), result)
-        expected = (self.valid, get_expected_diagnosis(self.diagnosis))
+        expected = get_expected_diagnosis(self.diagnosis)
 
         self.assertEqual(
             result,
