@@ -91,7 +91,6 @@ class DNSValidator(object):
             except ValueError:
                 pass
 
-        if len(return_status) == 0:
-            return ValidDiagnosis() if diagnose is True else True
-        else:
-            return max(return_status) if diagnose is True else False
+        final_status = max(return_status)
+
+        return final_status if diagnose else final_status == ValidDiagnosis()
