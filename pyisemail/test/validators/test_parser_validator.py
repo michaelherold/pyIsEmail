@@ -10,7 +10,7 @@ from pyisemail.validators import ParserValidator
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
 
-    document = ET.parse("%s/data/tests.xml" % os.path.dirname(__file__))
+    document = ET.parse("%s/../data/tests.xml" % os.path.dirname(__file__))
     root = document.getroot()
 
     scenarios = []

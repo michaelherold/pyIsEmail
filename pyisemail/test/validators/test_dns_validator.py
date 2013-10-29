@@ -11,7 +11,7 @@ from pyisemail.validators.dns_validator import DNSValidator
 def get_scenarios():
     """Parses the tests.xml file and returns the scenarios list."""
 
-    document = ET.parse("%s/data/dns-tests.xml" % os.path.dirname(__file__))
+    document = ET.parse("%s/../data/dns-tests.xml" % os.path.dirname(__file__))
     root = document.getroot()
 
     scenarios = []
