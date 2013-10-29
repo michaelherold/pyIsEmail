@@ -29,7 +29,8 @@ setup(
     author_email="michael.j.herold@gmail.com",
     url="https://github.com/michaelherold/pyIsEmail",
     license="MIT",
-    packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.test"],
+    packages=["pyisemail", "pyisemail.diagnosis",
+              "pyisemail.grammars", "pyisemail.test"],
     include_package_data=True,
     exclude_package_data={
         '': ['.gitignore']
@@ -37,6 +38,7 @@ setup(
     zip_safe=False,
     install_requires=[
         "dnspython >= 1.10.0",
+        "pyparsing >= 2.0.1"
     ],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
     test_suite="pyisemail.test",
