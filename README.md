@@ -1,7 +1,7 @@
 # pyIsEmail
 
-[![Build Status](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=develop)[travis]
-[![Coverage Status](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=develop)[coveralls]
+[![Build Status](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=develop)][travis]
+[![Coverage Status](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=develop)][coveralls]
 
 pyIsEmail is a simple egg that provides robust checking for email formatting,
 based on the work of Dominic Sayers at http://isemail.info.
@@ -36,11 +36,11 @@ For the simplest usage, import and use the ``is_email`` function:
 
 ```python
 
-    from pyisemail import is_email
+from pyisemail import is_email
 
-    address = "test@example.com"
-    bool_result = is_email(address)
-    detailed_result = is_email(address, diagnose=True)
+address = "test@example.com"
+bool_result = is_email(address)
+detailed_result = is_email(address, diagnose=True)
 ```
 
 You can also check whether the domain used in the email is a valid domain and
@@ -48,11 +48,11 @@ whether or not it has a valid MX record:
 
 ```python
 
-    from pyisemail import is_email
+from pyisemail import is_email
 
-    address = "test@example.com"
-    bool_result_with_dns = is_email(address, check_dns=True)
-    detailed_result_with_dns = is_email(address, check_dns=True, diagnose=True)
+address = "test@example.com"
+bool_result_with_dns = is_email(address, check_dns=True)
+detailed_result_with_dns = is_email(address, check_dns=True, diagnose=True)
 ```
 
 These are primary indicators of whether an email address can even be issued at
