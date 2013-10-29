@@ -1,6 +1,7 @@
 import unittest
 from pyisemail import Reference
 
+
 class ReferenceTest(unittest.TestCase):
 
     def test_repr(self):
