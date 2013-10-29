@@ -79,4 +79,12 @@
     <source>Dominic Sayers</source>
     <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
   </test>
+  <test id="169">
+    <address>test@gmail.com</address>
+    <comment>For full coverage, test a known working example, in this case, gmail.com.</comment>
+    <category>ISEMAIL_VALID_CATEGORY</category>
+    <diagnosis>ISEMAIL_VALID</diagnosis>
+    <source>Michael Herold</source>
+    <sourcelink>http://github.com/michaelherold/pyIsEmail</sourcelink>
+  </test>
 </tests>
