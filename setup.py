@@ -7,7 +7,7 @@ from pyisemail import __version__
 
 kwargs = {}
 
-with open('README.rst') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 setup(
