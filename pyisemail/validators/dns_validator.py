@@ -31,6 +31,9 @@ class DNSValidator(object):
         try:
             dns.resolver.query(domain, 'MX')
             dns_checked = True
+        except dns.name.NameTooLong:
+            # This shouldn't happen because we've already validated the length
+            pass
         except dns.resolver.NXDOMAIN:
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis('NO_RECORD'))
@@ -92,7 +95,3 @@ class DNSValidator(object):
             return ValidDiagnosis() if diagnose is True else True
         else:
             return max(return_status) if diagnose is True else False
-
-if __name__ == '__main__':
-    v = DNSValidator()
-    print v.is_valid("e.com")
