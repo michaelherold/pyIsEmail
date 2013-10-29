@@ -38,7 +38,6 @@ setup(
     install_requires=[
         "dnspython >= 1.10.0"
     ],
-    setup_requires=["setuptools-git >= 0.4.2"],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
     test_suite="pyisemail.test",
     **kwargs
