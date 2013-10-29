@@ -6,6 +6,22 @@ class RFC5322Diagnosis(BaseDiagnosis):
     DESCRIPTION = ("Address is only valid according to the "
                    "broad definition of RFC5322. It is otherwise invalid.")
 
+    ERROR_CODES = {
+        'DOMAIN': 65,
+        'TOOLONG': 66,
+        'LOCAL_TOOLONG': 67,
+        'DOMAIN_TOOLONG': 68,
+        'LABEL_TOOLONG': 69,
+        'DOMAINLITERAL': 70,
+        'DOMLIT_OBSDTEXT': 71,
+        'IPV6_GRPCOUNT': 72,
+        'IPV6_2X2XCOLON': 73,
+        'IPV6_BADCHAR': 74,
+        'IPV6_MAXGRPS': 75,
+        'IPV6_COLONSTRT': 76,
+        'IPV6_COLONEND': 77,
+    }
+
     MESSAGES = {
         'DOMAIN': ("Address is RFC5322 compliant but contains domain "
                    "characters that are not allowed by DNS."),

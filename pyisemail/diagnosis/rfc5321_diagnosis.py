@@ -5,6 +5,14 @@ class RFC5321Diagnosis(BaseDiagnosis):
 
     DESCRIPTION = "Address is valid for SMTP but has unusual elements."
 
+    ERROR_CODES = {
+        'TLD': 9,
+        'TLDNUMERIC': 10,
+        'QUOTEDSTRING': 11,
+        'ADDRESSLITERAL': 12,
+        'IPV6DEPRECATED': 13,
+    }
+
     MESSAGES = {
         'TLD': "Address is valid but at a Top Level Domain.",
         'TLDNUMERIC': ("Address is valid but the Top Level Domain "

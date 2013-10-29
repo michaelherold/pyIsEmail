@@ -5,6 +5,16 @@ class DeprecatedDiagnosis(BaseDiagnosis):
     DESCRIPTION = ("Address contains deprecated elements "
                    "but may still be valid in restricted contexts.")
 
+    ERROR_CODES = {
+        'LOCALPART': 33,
+        'FWS': 34,
+        'QTEXT': 35,
+        'QP': 36,
+        'COMMENT': 37,
+        'CTEXT': 38,
+        'CFWS_NEAR_AT': 49,
+    }
+
     MESSAGES = {
         'LOCALPART': "Address contains a local part in deprecated form.",
         'FWS': "Address contains Folding White Space in deprecated form.",

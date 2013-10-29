@@ -15,3 +15,4 @@ class ValidDiagnosis(BaseDiagnosis):
         self.description = self.DESCRIPTION
         self.message = self.MESSAGE
         self.references = None
+        self.code = 0

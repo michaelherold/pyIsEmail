@@ -100,16 +100,16 @@ class EmailValidatorTest(TestWithScenarios):
              #% (self.id, self.address, result, expected, str(v)))
         #)
 
-    def test_email_validator_with_diagnosis(self):
+    #def test_email_validator_with_diagnosis(self):
 
-        v = EmailValidator()
+        #v = EmailValidator()
 
-        result = v.is_email(self.address, diagnose=True)
-        expected = (self.valid, get_expected_diagnosis(self.diagnosis))
+        #result = v.is_email(self.address, diagnose=True)
+        #expected = (self.valid, get_expected_diagnosis(self.diagnosis))
 
-        self.assertEqual(
-            result,
-            expected,
-            ("%s (%s): Got %s, but expected %s. (%s)"
-             % (self.id, self.address, result, expected, str(v)))
-        )
+        #self.assertEqual(
+            #result,
+            #expected,
+            #("%s (%s): Got %s, but expected %s. (%s)"
+             #% (self.id, self.address, result, expected, str(v)))
+        #)

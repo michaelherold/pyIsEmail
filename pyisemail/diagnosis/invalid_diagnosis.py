@@ -4,6 +4,31 @@ from pyisemail.diagnosis import BaseDiagnosis
 class InvalidDiagnosis(BaseDiagnosis):
     DESCRIPTION = "Address is invalid for any purpose"
 
+    ERROR_CODES = {
+        'EXPECTING_DTEXT': 129,
+        'NOLOCALPART': 130,
+        'NODOMAIN': 131,
+        'CONSECUTIVEDOTS': 132,
+        'ATEXT_AFTER_CFWS': 133,
+        'ATEXT_AFTER_QS': 134,
+        'ATEXT_AFTER_DOMLIT': 135,
+        'EXPECTING_QPAIR': 136,
+        'EXPECTING_ATEXT': 137,
+        'EXPECTING_QTEXT': 138,
+        'EXPECTING_CTEXT': 139,
+        'BACKSLASHEND': 140,
+        'DOT_START': 141,
+        'DOT_END': 142,
+        'DOMAINHYPHENSTART': 143,
+        'DOMAINHYPHENEND': 144,
+        'UNCLOSEDQUOTEDSTR': 145,
+        'UNCLOSEDCOMMENT': 146,
+        'UNCLOSEDDOMLIT': 147,
+        'FWS_CRLF_X2': 148,
+        'FWS_CRLF_END': 149,
+        'CR_NO_LF': 150,
+    }
+
     MESSAGES = {
         'EXPECTING_DTEXT': ("Address contains a character that is "
                             "not allowed in a domain literal."),
