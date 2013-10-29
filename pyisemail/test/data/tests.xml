@@ -67,6 +67,7 @@ Date       Tests        Version Notes
     <diagnosis>ISEMAIL_VALID</diagnosis>
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+    <flaky>True</flaky>
   </test>
   <test id="6">
     <address>@io</address>

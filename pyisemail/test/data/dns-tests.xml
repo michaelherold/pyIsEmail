@@ -78,6 +78,7 @@
     <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
     <source>Dominic Sayers</source>
     <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+    <flaky>True</flaky>
   </test>
   <test id="169">
     <address>test@gmail.com</address>

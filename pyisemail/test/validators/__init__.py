@@ -25,12 +25,13 @@ def create_diagnosis(tag):
     return d_class(diagnosis_type)
 
 
-def get_scenarios(filename):
+def get_scenarios(filename, flaky=False):
 
     """Parse the given test file and return the scenarios list.
 
     Keyword arguments:
     filename --- the name of the test XML file to parse
+    flaky    --- flag to include or exclude only flaky tests
 
     """
 
@@ -46,10 +47,14 @@ def get_scenarios(filename):
         attrs['id'] = str(test.attrib['id'])
         attrs['address'] = _get_node_text(test.find('address').text)
         attrs['diagnosis'] = _get_node_text(test.find('diagnosis').text)
+        try:
+            attrs['flaky'] = _get_node_text(test.find('flaky').text) == "True"
+        except AttributeError:
+            attrs['flaky'] = False
 
-        scenario = (id, attrs)
-
-        scenarios.append(scenario)
+        if attrs['flaky'] is flaky:
+            scenario = (id, attrs)
+            scenarios.append(scenario)
 
     return scenarios
 
