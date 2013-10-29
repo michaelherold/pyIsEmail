@@ -82,25 +82,25 @@ def get_expected_diagnosis(tag):
     return d_class(diagnosis_type)
 
 
-class EmailValidatorTest(TestWithScenarios):
+class ParserValidatorTest(TestWithScenarios):
 
     scenarios = get_scenarios()
 
-    #def test_parser_validator_without_diagnosis(self):
+    def test_without_diagnosis(self):
 
-        #v = ParserValidator()
+        v = ParserValidator()
 
-        #result = v.is_email(self.address, checkDNS=False, errorLevel=False)
-        #expected = self.valid
+        result = v.is_email(self.address)
+        expected = self.valid
 
-        #self.assertEqual(
-            #result,
-            #expected,
-            #("%s (%s): Got %s, but expected %s. (%s)"
-             #% (self.id, self.address, result, expected, str(v)))
-        #)
+        self.assertEqual(
+            result,
+            expected,
+            ("%s (%s): Got %s, but expected %s."
+             % (self.id, self.address, result, expected))
+        )
 
-    def test_parser_validator_with_diagnosis(self):
+    def test_with_diagnosis(self):
 
         v = ParserValidator()
 

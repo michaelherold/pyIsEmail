@@ -55,8 +55,6 @@ Context = enum(LOCALPART=0,
                QUOTEDSTRING=5,
                QUOTEDPAIR=6)
 
-DEBUG = False
-
 
 class ParserValidator(EmailValidator):
     def is_email(self, address, diagnose=False):
@@ -100,9 +98,6 @@ class ParserValidator(EmailValidator):
         skip = False            # Skip flag that simulates i++
         crlf_count = -1         # crlf_count = -1 == !isset(crlf_count)
 
-        if DEBUG:
-            print "con\tend\ttok\tret\tcon\tend\ttok\tret\tpar\t\tat"
-
         for i in xrange(raw_length):
 
             # Skip simulates the use of ++ operator
@@ -112,12 +107,6 @@ class ParserValidator(EmailValidator):
 
             token = address[i]
             token = to_char(token)
-
-            if DEBUG:
-                print u"%i\t%s\t%s\t%r\t" % (context,
-                                             end_or_die,
-                                             token,
-                                             max(return_status).code),
 
             # Switch to simulate decrementing; needed for FWS
             repeat = True
@@ -1037,15 +1026,7 @@ class ParserValidator(EmailValidator):
                 else:
                     SystemExit("Unknown context: %s" % context)
 
-            if DEBUG:
-                print u"%i\t%s\t%s\t%r\t%s" % (context,
-                                               end_or_die,
-                                               token,
-                                               max(return_status).code,
-                                               str(parse_data))
-
             # No point in going on if we've got a fatal error
-            t = max(return_status)
             if max(return_status) > BaseDiagnosis.CATEGORIES['RFC5322']:
                 break
 
@@ -1105,48 +1086,6 @@ class ParserValidator(EmailValidator):
             elif element_len > 63:
                 return_status.append(RFC5322Diagnosis('LABEL_TOOLONG'))
 
-        # Check for TLD addresses
-        # -----------------------
-        # TLD addresses are specifically allowed in RFC 5321 but they are
-        # unusual to say the least. We will allocate a separate
-        # status to these addresses on the basis that they are more likely
-        # to be typos than genuine addresses (unless we've already
-        # established that the domain does have an MX record)
-        #
-        # http://tools.ietf.org/html/rfc5321#section-2.3.5
-        #   In the case
-        #   of a top-level domain used by itself in an address address, a single
-        #   string is used without any dots.  This makes the requirement,
-        #   described in more detail below, that only fully-qualified domain
-        #   names appear in SMTP transactions on the public Internet,
-        #   particularly important where top-level domains are involved.
-        #
-        # TLD format
-        # ----------
-        # The format of TLDs has changed a number of times. The standards
-        # used by IANA have been largely ignored by ICANN, leading to
-        # confusion over the standards being followed. These are not defined
-        # anywhere, except as a general component of a DNS host name (a label).
-        # However, this could potentially lead to 123.123.123.123 being a
-        # valid DNS name (rather than an IP address) and thereby creating
-        # an ambiguity. The most authoritative statement on TLD formats that
-        # the author can find is in a (rejected!) erratum to RFC 1123
-        # submitted by John Klensin, the author of RFC 5321:
-        #
-        # http://www.rfc-editor.org/errata_search.php?rfc=1123&eid=1353
-        #   However, a valid host name can never have the dotted-decimal
-        #   form #.#.#.#, since this change does not permit the highest-level
-        #   component label to start with a digit even if it is not all-numeric.
-        if max(return_status) < BaseDiagnosis.CATEGORIES['DNSWARN']:
-            if element_count == 0:
-                return_status.append(RFC5321Diagnosis('TLD'))
-
-            try:
-                float(atomList[Context.DOMAIN][element_count][0])
-                return_status.append(RFC5321Diagnosis('TLDNUMERIC'))
-            except ValueError:
-                pass
-
         return_status = list(set(return_status))
         final_status = max(return_status)
 
@@ -1161,9 +1100,7 @@ class ParserValidator(EmailValidator):
 
         return final_status if diagnose else final_status < BaseDiagnosis.CATEGORIES['THRESHOLD']
 
-
 if __name__ == '__main__':
-    q = {}
-    p = ParserValidator()
-    print p.is_email("test@io", True) == RFC5321Diagnosis('TLD')
-    print p.is_email("michael@veripulse.com") == True
+    v = ParserValidator()
+
+    print v.is_email("test@io", True)

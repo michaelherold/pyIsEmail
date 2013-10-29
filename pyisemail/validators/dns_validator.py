@@ -1,10 +1,10 @@
 import dns.resolver
-from pyisemail.diagnosis import DNSDiagnosis, BaseDiagnosis, RFC5321Diagnosis
+from pyisemail.diagnosis import DNSDiagnosis, BaseDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
 
 class DNSValidator(object):
 
-    def is_valid(self, domain):
+    def is_valid(self, domain, diagnose=False):
 
         return_status = []
         dns_checked = False
@@ -31,11 +31,11 @@ class DNSValidator(object):
 
         # Checking TLD DNS seems to work only if you explicitly check for the
         # root
-        if element_count == 0:
-            parseData[Context.DOMAIN] += '.'
+        if len(domain.split(".")) == 1:
+            domain += '.'
 
         try:
-            result = dns.resolver.query(domain, 'MX')
+            dns.resolver.query(domain, 'MX')
             dns_checked = True
         except dns.resolver.NXDOMAIN:
             # Domain can't be found in DNS
@@ -46,12 +46,55 @@ class DNSValidator(object):
 
             try:
                 # TODO: See if we can/need to narrow to A / CNAME
-                result = dns.resolver.query(domain)
+                dns.resolver.query(domain)
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
                 return_status.append(DNSDiagnosis('NO_RECORD'))
 
+        # Check for TLD addresses
+        # -----------------------
+        # TLD addresses are specifically allowed in RFC 5321 but they are
+        # unusual to say the least. We will allocate a separate
+        # status to these addresses on the basis that they are more likely
+        # to be typos than genuine addresses (unless we've already
+        # established that the domain does have an MX record)
+        #
+        # http://tools.ietf.org/html/rfc5321#section-2.3.5
+        #   In the case
+        #   of a top-level domain used by itself in an address address, a single
+        #   string is used without any dots.  This makes the requirement,
+        #   described in more detail below, that only fully-qualified domain
+        #   names appear in SMTP transactions on the public Internet,
+        #   particularly important where top-level domains are involved.
+        #
+        # TLD format
+        # ----------
+        # The format of TLDs has changed a number of times. The standards
+        # used by IANA have been largely ignored by ICANN, leading to
+        # confusion over the standards being followed. These are not defined
+        # anywhere, except as a general component of a DNS host name (a label).
+        # However, this could potentially lead to 123.123.123.123 being a
+        # valid DNS name (rather than an IP address) and thereby creating
+        # an ambiguity. The most authoritative statement on TLD formats that
+        # the author can find is in a (rejected!) erratum to RFC 1123
+        # submitted by John Klensin, the author of RFC 5321:
+        #
+        # http://www.rfc-editor.org/errata_search.php?rfc=1123&eid=1353
+        #   However, a valid host name can never have the dotted-decimal
+        #   form #.#.#.#, since this change does not permit the highest-level
+        #   component label to start with a digit even if it is not all-numeric.
+        if not dns_checked and max(return_status) < BaseDiagnosis.CATEGORIES['DNSWARN']:
+            atom_list = domain.split(".")
+            if len(atom_list) == 1:
+                return_status.append(RFC5321Diagnosis('TLD'))
+
+            try:
+                float(atom_list[len(atom_list)][0])
+                return_status.append(RFC5321Diagnosis('TLDNUMERIC'))
+            except ValueError:
+                pass
+
         if len(return_status) == 0:
-            return True
+            return ValidDiagnosis() if diagnose is True else True
         else:
-            return max(return_status)
+            return max(return_status) if diagnose is True else False
