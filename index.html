@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>pyIsEmail by michaelherold</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>pyIsEmail</h1>
+        <p>Simple, robust email validation</p>
+
+        <p class="view"><a href="https://github.com/michaelherold/pyIsEmail">View the Project on GitHub <small>michaelherold/pyIsEmail</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/michaelherold/pyIsEmail/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/michaelherold/pyIsEmail/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/michaelherold/pyIsEmail">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<p>pyIsEmail is a no-nonsense approach for checking whether that user-supplied
+email address could be real. Sick of not being able to use
+<a href="http://en.wikipedia.org/wiki/Email_address#Address_tags">email address tagging</a> to sort through your <a href="http://en.wikipedia.org/wiki/Bacn">Bacn</a>? We can fix
+that.</p>
+
+<p>Regular expressions are cheap to write, but often require maintenance when new
+top-level domains come out or don't conform to email addressing features that
+come back into vogue. pyIsEmail allows you to validate an email address -- and
+even check the domain, if you wish -- with one simple call, making your code
+more readable and faster to write. When you want to know why an email address
+doesn't validate, we even provide you with a diagnosis.</p>
+
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Install from PyPI using <a href="http://www.pip-installer.org/en/latest/">pip</a>, a package manager for Python.</p>
+
+<pre><code>$ pip install pyIsEmail
+</code></pre>
+
+<p>Don't have pip installed? Try installing it, by running this from the command
+line:</p>
+
+<pre><code>$ curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+</code></pre>
+
+<p>Or, you can <a href="https://github.com/michaelherold/pyIsEmail/zipball/develop">download the source code (zip)</a> for <code>pyIsEmail</code>, and
+then run:</p>
+
+<pre><code>$ python setup.py install
+</code></pre>
+
+<p>You may need to run the above commands with <code>sudo</code>.</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>For the simplest usage, import and use the <code>is_email</code> function:</p>
+
+<div class="highlight highlight-python"><pre>
+<span class="kn">from</span> <span class="nn">pyisemail</span> <span class="kn">import</span> <span class="n">is_email</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="s">"test@example.com"</span>
+<span class="n">bool_result</span> <span class="o">=</span> <span class="n">is_email</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+<span class="n">detailed_result</span> <span class="o">=</span> <span class="n">is_email</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">diagnose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+<p>You can also check whether the domain used in the email is a valid domain and
+whether or not it has a valid MX record:</p>
+
+<div class="highlight highlight-python"><pre>
+<span class="kn">from</span> <span class="nn">pyisemail</span> <span class="kn">import</span> <span class="n">is_email</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="s">"test@example.com"</span>
+<span class="n">bool_result_with_dns</span> <span class="o">=</span> <span class="n">is_email</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">check_dns</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">detailed_result_with_dns</span> <span class="o">=</span> <span class="n">is_email</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">check_dns</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">diagnose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+<p>These are primary indicators of whether an email address can even be issued at
+that domain. However, a valid response here <em>is not a guarantee that the email
+exists</em>, merely that is <em>can</em> exist.</p>
+
+<p>In addition to the base <code>is_email</code> functionality, you can also use the
+validators by themselves. Check the validator source code to see how this works.</p>
+
+<h2>
+<a name="uninstall" class="anchor" href="#uninstall"><span class="octicon octicon-link"></span></a>Uninstall</h2>
+
+<p>Want to get rid of pyIsEmail? Did you install with pip? Here you go:</p>
+
+<pre><code>$ pip uninstall pyIsEmail
+</code></pre>
+
+<h2>
+<a name="acknowledgments" class="anchor" href="#acknowledgments"><span class="octicon octicon-link"></span></a>Acknowledgments</h2>
+
+<p>The base <code>ParserValidator</code> is based off of <a href="https://github.com/dominicsayers">Dominic Sayers</a>'
+<a href="https://github.com/dominicsayers/isemail">is_email script</a>. I wanted the functionality in Python, so I ported
+it from the original PHP.</p>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol><h2>
+<a name="versioning" class="anchor" href="#versioning"><span class="octicon octicon-link"></span></a>Versioning</h2>
+
+<p>This library aims to adhere to <a href="http://semver.org/">Semantic Versioning 2.0.0</a>. Violations
+of this scheme should be reported as bugs.</p>
+
+<h2>
+<a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
+
+<p>Copyright (c) 2013 Michael Herold. See LICENSE for details.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/michaelherold">michaelherold</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-45292474-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
