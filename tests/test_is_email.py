@@ -2,7 +2,7 @@ from unittest import expectedFailure
 from testscenarios import TestWithScenarios
 from pyisemail import is_email
 from pyisemail.diagnosis import BaseDiagnosis
-from pyisemail.test.validators import create_diagnosis, get_scenarios
+from tests.validators import create_diagnosis, get_scenarios
 
 
 class IsEmailTest(TestWithScenarios):

@@ -1,8 +1,8 @@
 from unittest import expectedFailure
 from testscenarios import TestWithScenarios
 from pyisemail.diagnosis import ValidDiagnosis
-from pyisemail.test.validators import create_diagnosis, get_scenarios
-from pyisemail.validators.dns_validator import DNSValidator
+from pyisemail.validators import DNSValidator
+from tests.validators import create_diagnosis, get_scenarios
 
 
 class DNSValidatorTest(TestWithScenarios):
@@ -45,7 +45,7 @@ class DNSValidatorFlakyTest(TestWithScenarios):
     """Test suite for flaky DNSValidator tests.
 
     Due to different DNS servers handling missing domains differently, these
-    tests are marked as flaky. A flaky test might succeed in one environment
+    tests are marked as flaky. A flaky tests might succeed in one environment
     and fail in another, purely due to DNS issues. An ideal fix for this
     behavior would be to mock the DNS check to alleviate this problem, but for
     now this will have to do.

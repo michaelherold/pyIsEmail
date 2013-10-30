@@ -1,7 +1,7 @@
 from testscenarios import TestWithScenarios
 from pyisemail.diagnosis import BaseDiagnosis
-from pyisemail.test.validators import create_diagnosis, get_scenarios
 from pyisemail.validators import ParserValidator
+from tests.validators import create_diagnosis, get_scenarios
 
 
 class ParserValidatorTest(TestWithScenarios):

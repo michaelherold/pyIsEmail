@@ -51,6 +51,6 @@ setup(
     ],
     setup_requires=["pypandoc >= 0.7.0"],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
-    test_suite="pyisemail.test",
+    test_suite="tests",
     **kwargs
 )
