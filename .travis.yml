@@ -4,8 +4,8 @@ python:
   - 3.2
   - 3.3
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION < 3 ]]; then pip install -r requirements-py2.txt --use-mirrors; fi
-  - if [[ $TRAVIS_PYTHON_VERSION >= 3 ]]; then pip install -r requirements-py3.txt --use-mirrors; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install -r requirements-py2.txt --use-mirrors; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then pip install -r requirements-py3.txt --use-mirrors; fi
   - pip install -r requirements.txt --use-mirrors
   - pip install coveralls --use-mirrors
 script:
