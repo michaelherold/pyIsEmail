@@ -20,7 +20,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
         "Operating System :: OS Independent"
         "Topic :: Communications :: Email",
         "Topic :: Software Development :: Libraries",
