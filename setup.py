@@ -2,6 +2,7 @@ __author__ = "Michael Herold"
 __copyright__ = "Copyright (c) 2013 Michael Herold"
 __license__ = "MIT"
 
+import sys
 from setuptools import setup
 from pyisemail import __version__
 
@@ -9,6 +10,11 @@ kwargs = {}
 
 with open('README.md') as f:
     long_description = f.read()
+
+if sys.version_info[0] == 2:
+    dnspython = "dnspython"
+elif sys.version_info[0] == 3:
+    dnspython = "dnspython3"
 
 setup(
     name="pyIsEmail",
@@ -36,7 +42,7 @@ setup(
     },
     zip_safe=False,
     install_requires=[
-        "dnspython >= 1.10.0",
+        "%s >= 1.10.0" % dnspython,
     ],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
     test_suite="pyisemail.test",
