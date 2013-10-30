@@ -3,13 +3,27 @@
 [![Build Status](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=develop)][travis]
 [![Coverage Status](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=develop)][coveralls]
 
-pyIsEmail is a simple egg that provides robust checking for email formatting,
-based on the work of Dominic Sayers at http://isemail.info.
-
 [travis]: http://travis-ci.org/michaelherold/pyIsEmail
 [coveralls]: https://coveralls.io/r/michaelherold/pyIsEmail
 
-## Installation
+## Getting Started
+
+pyIsEmail is a no-nonsense approach for checking whether that user-supplied
+email address could be real. Sick of not being able to use
+[email address tagging][tagging] to sort through your [Bacn][bacn]? We can fix
+that.
+
+Regular expressions are cheap to write, but often require maintenance when new
+top-level domains come out or don't conform to email addressing features that
+come back into vogue. pyIsEmail allows you to validate an email address -- and
+even check the domain, if you wish -- with one simple call, making your code
+more readable and faster to write. When you want to know why an email address
+doesn't validate, we even provide you with a diagnosis.
+
+[tagging]: http://en.wikipedia.org/wiki/Email_address#Address_tags
+[bacn]: http://en.wikipedia.org/wiki/Bacn
+
+## Install
 
 Install from PyPI using [pip], a package manager for Python.
 
@@ -62,11 +76,17 @@ exists*, merely that is *can* exist.
 In addition to the base ``is_email`` functionality, you can also use the
 validators by themselves. Check the validator source code to see how this works.
 
+## Uninstall
+
+Want to get rid of pyIsEmail? Did you install with pip? Here you go:
+
+    $ pip uninstall pyIsEmail
+
 ## Acknowledgments
 
 The base ``ParserValidator`` is based off of [Dominic Sayers][dominic]'
-[is_email script][is_email].
-I wanted the functionality in Python, so I ported it from PHP.
+[is_email script][is_email]. I wanted the functionality in Python, so I ported
+it from the original PHP.
 
 [dominic]: https://github.com/dominicsayers
 [is_email]: https://github.com/dominicsayers/isemail
