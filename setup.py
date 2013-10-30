@@ -12,8 +12,11 @@ try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
 except (IOError, ImportError):
-    with open('README.md', 'r') as f:
-        long_description = f.read()
+    try:
+        with open('README.md', 'r') as f:
+            long_description = f.read()
+    except IOError:  # For tox
+        long_description = ""
 
 if sys.version_info[0] == 2:
     dnspython = "dnspython"
