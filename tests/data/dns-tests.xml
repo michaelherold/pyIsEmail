@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<tests version="3.0">
+  <test id="12">
+    <address>test@e.com</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="13">
+    <address>test@iana.a</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="23">
+    <address>test@iana.123</address>
+    <category>ISEMAIL_RFC5321</category>
+    <diagnosis>ISEMAIL_RFC5321_TLDNUMERIC</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="24">
+    <address>test@255.255.255.255</address>
+    <category>ISEMAIL_RFC5321</category>
+    <diagnosis>ISEMAIL_RFC5321_TLDNUMERIC</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="27">
+    <address>test@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.com</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="33">
+    <address>test@iana.co-uk</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="37">
+    <address>a@a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="38">
+    <address>abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghiklm@abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghikl.abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghi</address>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Michael Rushton</source>
+    <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+  </test>
+  <test id="166">
+    <address>test@org</address>
+    <category>ISEMAIL_RFC5321</category>
+    <diagnosis>ISEMAIL_RFC5321_TLD</diagnosis>
+    <source>Dominic Sayers</source>
+    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+  </test>
+  <test id="167">
+    <address>test@test.com</address>
+    <comment>test.com has an A-record but not an MX-record</comment>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_MX_RECORD</diagnosis>
+    <source>Dominic Sayers</source>
+    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+  </test>
+  <test id="168">
+    <address>test@nic.no</address>
+    <comment>nic.no currently has no MX-records or A-records (Feb 2011). If you are seeing an A-record for nic.io then try setting your DNS server to 8.8.8.8 (the Google DNS server) - your DNS server may be faking an A-record (OpenDNS does this, for instance).</comment>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Dominic Sayers</source>
+    <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+    <flaky>True</flaky>
+  </test>
+  <test id="169">
+    <address>test@gmail.com</address>
+    <comment>For full coverage, test a known working example, in this case, gmail.com.</comment>
+    <category>ISEMAIL_VALID_CATEGORY</category>
+    <diagnosis>ISEMAIL_VALID</diagnosis>
+    <source>Michael Herold</source>
+    <sourcelink>http://github.com/michaelherold/pyIsEmail</sourcelink>
+  </test>
+</tests>

@@ -1,42 +1,59 @@
 __author__ = "Michael Herold"
-__copyright__ = "Copyright (c) 2012 Michael Herold"
-__license__ = "BSD"
+__copyright__ = "Copyright (c) 2013 Michael Herold"
+__license__ = "MIT"
 
-from setuptools import setup, find_packages
-from common.version import version
+import sys
+from setuptools import setup
+from pyisemail import __version__
+
+kwargs = {}
+
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+    try:
+        with open('README.md', 'r') as f:
+            long_description = f.read()
+    except IOError:  # For tox
+        long_description = ""
+
+if sys.version_info[0] == 2:
+    dnspython = "dnspython"
+elif sys.version_info[0] == 3:
+    dnspython = "dnspython3"
 
 setup(
-    name = "pyIsEmail",
-    version = version,
-    description = "Email format checker based on http://isemail.info",
-    long_description = open("README.rst").read(),
-    classifiers = [
-        "Development Status :: 1 - Planning",
+    name="pyIsEmail",
+    version=__version__,
+    description="Simple, robust email validation",
+    long_description=long_description,
+    classifiers=[
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Operating System :: OS Independent"
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
         "Topic :: Communications :: Email",
-        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords = "",
-    author = "Michael Herold",
-    author_email = "michael.j.herold@gmail.com",
-    url = "https://github.com/michaelherold/pyIsEmail",
-    license = "BSD",
-    packages = find_packages(
-        exclude = ["*.test", "*.test.*", "test.*", "test"]
-    ),
-    include_package_data = True,
-    exclude_package_data = {
-        '': ['.gitignore', '.venv']
-    }
-    zip_safe = False,
-    install_requires = [
-        # -*- Extra requirements: -*-
+    keywords=['email', 'validation'],
+    author="Michael Herold",
+    author_email="michael.j.herold@gmail.com",
+    url="https://github.com/michaelherold/pyIsEmail",
+    license="MIT",
+    packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.validators"],
+    include_package_data=True,
+    exclude_package_data={
+        '': ['.gitignore']
+    },
+    zip_safe=False,
+    install_requires=[
+        "%s >= 1.10.0" % dnspython,
     ],
-    setup_requires = ["setuptool_git >= 0.4.2",]
-    entry_points = """
-    # -*- Entry points: -*-
-    """
+    setup_requires=["pypandoc >= 0.7.0"],
+    tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
+    test_suite="tests",
+    **kwargs
 )
