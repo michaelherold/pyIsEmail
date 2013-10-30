@@ -4,7 +4,7 @@ from pyisemail.reference import Reference
 from pyisemail.validators import ParserValidator
 from pyisemail.validators.dns_validator import DNSValidator
 
-__version__ = '0.0.1'
+__version__ = '1.0.0'
 __all__ = ['is_email']
 
 
