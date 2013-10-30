@@ -834,15 +834,6 @@ class ParserValidator(EmailValidator):
                         parse_data[Context.LOCALPART] += token
                         atom_list[Context.LOCALPART][element_count] += token
                         element_len += 1
-
-                        # TODO
-                        # http://tools.ietf.org/html/rfc5322#section-3.4.1
-                        #   If the string can be represented as a dot-atom (that
-                        #   is, it contains no characters other than atext
-                        #   characters or "." surrounded by atext characters),
-                        #   then the dot-atom form SHOULD be used and the
-                        #   quoted-string form SHOULD NOT be used.
-
                 #--------------------------------------------------------
                 # Quoted pair
                 #--------------------------------------------------------
@@ -1122,7 +1113,3 @@ class ParserValidator(EmailValidator):
             return final_status
         else:
             return final_status < BaseDiagnosis.CATEGORIES['THRESHOLD']
-
-if __name__ == '__main__':
-    v = ParserValidator()
-    print v.is_email("test@iana.org&#x240D;&#x240A;", True)
