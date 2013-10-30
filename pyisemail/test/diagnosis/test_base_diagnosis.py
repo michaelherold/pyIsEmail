@@ -28,3 +28,9 @@ class BaseDiagnosisTest(unittest.TestCase):
         d2.code = 1
 
         self.assertEqual(d1, d2)
+
+    def test_hash(self):
+        d1 = BaseDiagnosis("test")
+        d2 = BaseDiagnosis("test")
+
+        self.assertEqual(hash(d1), hash(d2))

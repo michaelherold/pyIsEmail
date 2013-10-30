@@ -33,7 +33,7 @@ class BaseDiagnosis(object):
         return "<%s: %s>" % (self.__class__.__name__, self.diagnosis_type)
 
     def __hash__(self):
-        return hash((self.__class__.name, self.diagnosis_type))
+        return hash((self.__class__.__name__, self.diagnosis_type))
 
     def __eq__(self, other):
         return repr(self) == repr(other)
