@@ -1,4 +1,5 @@
 import re
+import sys
 from pyisemail import EmailValidator
 from pyisemail.diagnosis import BaseDiagnosis, CFWSDiagnosis
 from pyisemail.diagnosis import DeprecatedDiagnosis
@@ -36,6 +37,13 @@ Context = enum(LOCALPART=0,
                QUOTEDSTRING=5,
                QUOTEDPAIR=6)
 
+if sys.version_info[0] == 3:
+    _unichr = chr
+    _range = range
+elif sys.version_info[0] == 2:
+    _unichr = unichr
+    _range = xrange
+
 
 def to_char(token):
     """Transforms the ASCII control character symbols to their real char.
@@ -47,8 +55,8 @@ def to_char(token):
     token -- the token to transform
 
     """
-    if ord(token) in range(9216, 9229 + 1):
-        token = unichr(ord(token) - 9216)
+    if ord(token) in _range(9216, 9229 + 1):
+        token = _unichr(ord(token) - 9216)
 
     return token
 
@@ -94,7 +102,7 @@ class ParserValidator(EmailValidator):
         skip = False            # Skip flag that simulates i++
         crlf_count = -1         # crlf_count = -1 == !isset(crlf_count)
 
-        for i in xrange(raw_length):
+        for i in _range(raw_length):
 
             # Skip simulates the use of ++ operator
             if skip:

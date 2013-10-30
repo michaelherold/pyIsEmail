@@ -31,7 +31,7 @@ class DNSValidator(object):
         try:
             dns.resolver.query(domain, 'MX')
             dns_checked = True
-        except dns.resolver.NXDOMAIN, dns.name.NameTooLong:
+        except (dns.resolver.NXDOMAIN, dns.name.NameTooLong):
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis('NO_RECORD'))
         except dns.resolver.NoAnswer:

@@ -1,10 +1,16 @@
 import os
+import sys
 import xml.etree.ElementTree as ET
 from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis, DNSDiagnosis
 from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
 from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
 
 __all__ = ["create_diagnosis", "get_scenarios"]
+
+if sys.version_info[0] == 3:
+    _unicode = str
+elif sys.version_info[0] == 2:
+    _unicode = unicode
 
 
 def create_diagnosis(tag):
@@ -69,7 +75,7 @@ def _get_node_text(text):
     """
 
     if text:
-        return unicode(text)
+        return _unicode(text)
     else:
         return ''
 
