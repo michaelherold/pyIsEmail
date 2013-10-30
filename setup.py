@@ -8,8 +8,12 @@ from pyisemail import __version__
 
 kwargs = {}
 
-with open('README.md') as f:
-    long_description = f.read()
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+    with open('README.md', 'r') as f:
+        long_description = f.read()
 
 if sys.version_info[0] == 2:
     dnspython = "dnspython"
@@ -19,7 +23,7 @@ elif sys.version_info[0] == 3:
 setup(
     name="pyIsEmail",
     version=__version__,
-    description="Email format checker based on http://isemail.info",
+    description="Simple, robust email validation",
     long_description=long_description,
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -27,16 +31,16 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent"
+        "Operating System :: OS Independent",
         "Topic :: Communications :: Email",
-        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords="",
+    keywords=['email', 'validation'],
     author="Michael Herold",
     author_email="michael.j.herold@gmail.com",
     url="https://github.com/michaelherold/pyIsEmail",
     license="MIT",
-    packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.test"],
+    packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.validators"],
     include_package_data=True,
     exclude_package_data={
         '': ['.gitignore']
@@ -45,6 +49,7 @@ setup(
     install_requires=[
         "%s >= 1.10.0" % dnspython,
     ],
+    setup_requires=["pypandoc >= 0.7.0"],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
     test_suite="pyisemail.test",
     **kwargs

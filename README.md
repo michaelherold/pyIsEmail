@@ -1,8 +1,10 @@
 # pyIsEmail
 
-[![Build Status](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=develop)][travis]
-[![Coverage Status](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=develop)][coveralls]
+[![Version](https://pypip.in/v/pyIsEmail/badge.png)][crate]
+[![Travis](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=master)][travis]
+[![Coverage](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=master)][coveralls]
 
+[crate]: https://crate.io/package/pyIsEmail
 [travis]: http://travis-ci.org/michaelherold/pyIsEmail
 [coveralls]: https://coveralls.io/r/michaelherold/pyIsEmail
 
@@ -108,4 +110,7 @@ of this scheme should be reported as bugs.
 
 ## Copyright
 
-Copyright (c) 2013 Michael Herold. See LICENSE for details.
+Copyright (c) 2013 Michael Herold. Open sourced under the terms of the
+[MIT license][license].
+
+[license]: http://opensource.org/licenses/MIT
