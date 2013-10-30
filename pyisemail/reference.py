@@ -1,5 +1,12 @@
 class Reference(object):
 
+    """A container for diagnosis references, for more information.
+
+    Holds the citation in the pertinent RFC, as well as a link to the specific
+    section of the RFC being referred to.
+
+    """
+
     DATA = {
         'local-part': {
             'link': "http://tools.ietf.org/html/rfc5322#section-3.4.1",

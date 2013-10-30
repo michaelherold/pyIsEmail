@@ -63,7 +63,7 @@ def to_char(token):
 
 class ParserValidator(EmailValidator):
     def is_email(self, address, diagnose=False):
-        """Check that an address address conforms to RFCs 5321, 5322 and others
+        """Check that an address address conforms to RFCs 5321, 5322 and others.
 
         More specifically, see the follow RFCs:
             * http://tools.ietf.org/html/rfc5321
@@ -74,7 +74,7 @@ class ParserValidator(EmailValidator):
 
         Keyword arguments:
         address    -- address to check.
-        diagnose   -- flag to report a diagnose or just True/False
+        diagnose   -- flag to report a diagnosis or a boolean (default False)
 
         """
 

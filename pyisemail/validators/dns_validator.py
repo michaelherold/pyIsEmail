@@ -1,19 +1,26 @@
 import dns.resolver
-from pyisemail.diagnosis import DNSDiagnosis, BaseDiagnosis, RFC5321Diagnosis, ValidDiagnosis
+from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
 
 class DNSValidator(object):
 
     def is_valid(self, domain, diagnose=False):
 
+        """Check whether a domain has a valid MX or A record.
+
+        Keyword arguments:
+        domain   --- the domain to check
+        diagnose --- flag to report a diagnosis or a boolean (default False)
+
+        """
+
         return_status = [ValidDiagnosis()]
         dns_checked = False
 
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
-        #   Names that can
-        #   be resolved to MX RRs or address (i.e., A or AAAA) RRs (as
-        #   discussed in Section 5) are permitted, as are CNAME RRs whose
-        #   targets can be resolved, in turn, to MX or address RRs.
+        #   Names that can be resolved to MX RRs or address (i.e., A or AAAA)
+        #   RRs (as discussed in Section 5) are permitted, as are CNAME RRs
+        #   whose targets can be resolved, in turn, to MX or address RRs.
         #
         # http://tools.ietf.org/html/rfc5321#section-5.1
         #   The lookup first attempts to locate an MX record associated with
@@ -54,9 +61,8 @@ class DNSValidator(object):
         # established that the domain does have an MX record)
         #
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
-        #   In the case
-        #   of a top-level domain used by itself in an address address, a single
-        #   string is used without any dots.  This makes the requirement,
+        #   In the case of a top-level domain used by itself in an address, a
+        #   single string is used without any dots.  This makes the requirement,
         #   described in more detail below, that only fully-qualified domain
         #   names appear in SMTP transactions on the public Internet,
         #   particularly important where top-level domains are involved.

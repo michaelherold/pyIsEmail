@@ -2,6 +2,11 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 
 class DeprecatedDiagnosis(BaseDiagnosis):
+
+    """A diagnosis indicating the presence of deprecated address features.
+
+    """
+
     DESCRIPTION = ("Address contains deprecated elements "
                    "but may still be valid in restricted contexts.")
 

@@ -3,6 +3,10 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 class DNSDiagnosis(BaseDiagnosis):
 
+    """A diagnosis indicating a lack of a DNS record for a domain.
+
+    """
+
     DESCRIPTION = "Address is valid but a DNS check was not successful."
 
     ERROR_CODES = {

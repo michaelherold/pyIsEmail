@@ -1,11 +1,11 @@
-__version__ = '0.0.1'
-__author__ = "Michael Herold"
-
 from pyisemail.diagnosis import BaseDiagnosis
 from pyisemail.email_validator import EmailValidator
 from pyisemail.reference import Reference
 from pyisemail.validators import ParserValidator
 from pyisemail.validators.dns_validator import DNSValidator
+
+__version__ = '0.0.1'
+__all__ = ['is_email']
 
 
 def is_email(address, check_dns=False, diagnose=False):

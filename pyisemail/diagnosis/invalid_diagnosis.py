@@ -2,6 +2,11 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 
 class InvalidDiagnosis(BaseDiagnosis):
+
+    """A diagnosis indicating the presence of an invalid address component.
+
+    """
+
     DESCRIPTION = "Address is invalid for any purpose"
 
     ERROR_CODES = {

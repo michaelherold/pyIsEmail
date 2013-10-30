@@ -2,6 +2,11 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 
 class CFWSDiagnosis(BaseDiagnosis):
+
+    """A diagnosis indicating a problem with white space in the address.
+
+    """
+
     DESCRIPTION = ("Address is valid within the message "
                    "but cannot be used unmodified for the envelope.")
 

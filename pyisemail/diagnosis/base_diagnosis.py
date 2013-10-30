@@ -3,6 +3,14 @@ from pyisemail.reference import Reference
 
 class BaseDiagnosis(object):
 
+    """Super class for an error diagnosis.
+
+    You should rarely, i.e. only in testing, instantiate a BaseDiagnosis, as
+    it does not provide any pertinent information. Always use one of its
+    subclasses.
+
+    """
+
     CATEGORIES = {
         'VALID': 1,
         'DNSWARN': 7,

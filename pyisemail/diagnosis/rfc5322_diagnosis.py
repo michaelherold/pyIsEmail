@@ -3,6 +3,10 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 class RFC5322Diagnosis(BaseDiagnosis):
 
+    """A diagnosis indicating the address is only technically valid.
+
+    """
+
     DESCRIPTION = ("Address is only valid according to the "
                    "broad definition of RFC5322. It is otherwise invalid.")
 

@@ -3,6 +3,10 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 class ValidDiagnosis(BaseDiagnosis):
 
+    """A diagnosis indicating the address is valid for use.
+
+    """
+
     DESCRIPTION = "Address is valid."
 
     MESSAGE = ("Address is valid. Please note that this does not mean "

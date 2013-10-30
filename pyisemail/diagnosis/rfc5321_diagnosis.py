@@ -3,6 +3,10 @@ from pyisemail.diagnosis import BaseDiagnosis
 
 class RFC5321Diagnosis(BaseDiagnosis):
 
+    """A diagnosis indicating the address is only valid for SMTP.
+
+    """
+
     DESCRIPTION = "Address is valid for SMTP but has unusual elements."
 
     ERROR_CODES = {
