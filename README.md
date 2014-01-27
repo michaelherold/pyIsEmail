@@ -1,12 +1,15 @@
 # pyIsEmail
 
-[![Version](https://pypip.in/v/pyIsEmail/badge.png)][crate]
+[![Version](https://pypip.in/v/pyIsEmail/badge.png)][pypi]
 [![Travis](https://travis-ci.org/michaelherold/pyIsEmail.png?branch=master)][travis]
 [![Coverage](https://coveralls.io/repos/michaelherold/pyIsEmail/badge.png?branch=master)][coveralls]
+[![Downloads](https://pypip.in/d/pyIsEmail/badge.png)][pypi]
+[![BitDeli](https://d2weczhvl823v0.cloudfront.net/michaelherold/pyisemail/trend.png)][bitdeli]
 
-[crate]: https://crate.io/package/pyIsEmail
-[travis]: http://travis-ci.org/michaelherold/pyIsEmail
+[bitdeli]: https://bitdeli.com/free
 [coveralls]: https://coveralls.io/r/michaelherold/pyIsEmail
+[pypi]: https://pypi.python.org/pypi/pyIsEmail/
+[travis]: http://travis-ci.org/michaelherold/pyIsEmail
 
 ## Getting Started
 
