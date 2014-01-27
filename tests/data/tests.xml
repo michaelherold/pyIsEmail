@@ -679,9 +679,14 @@ Date       Tests        Version Notes
   </test>
   <test id="100">
     <address>test@xn--hxajbheg2az3al.xn--jxalpdlp</address>
-    <comment>A valid IDN from ICANN's <a href="http://idn.icann.org/#The_example.test_names">IDN TLD evaluation gateway</a></comment>
+    <comment>
+      A valid IDN from ICANN's <a href="http://idn.icann.org/#The_example.test_names">IDN TLD evaluation gateway</a>.
+      Marked as flaky on 2014-01-27, as the DNS lookup started
+      returning false and the IDN page is down for maintenance.
+    </comment>
     <category>ISEMAIL_VALID_CATEGORY</category>
     <diagnosis>ISEMAIL_VALID</diagnosis>
+    <flaky>True</flaky>
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
   </test>
