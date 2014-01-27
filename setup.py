@@ -2,9 +2,9 @@ __author__ = "Michael Herold"
 __copyright__ = "Copyright (c) 2013 Michael Herold"
 __license__ = "MIT"
 
+import os
 import sys
 from setuptools import setup
-from pyisemail import __version__
 
 kwargs = {}
 
@@ -23,9 +23,17 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] == 3:
     dnspython = "dnspython3"
 
+def get_version():
+    basedir = os.path.dirname(__file__)
+    with open(os.path.join(basedir, 'pyisemail/version.py')) as f:
+        locals = {}
+        exec(f.read(), locals)
+        return locals['VERSION']
+    raise RuntimeError('No version information found.')
+
 setup(
     name="pyIsEmail",
-    version=__version__,
+    version=get_version(),
     description="Simple, robust email validation",
     long_description=long_description,
     classifiers=[
