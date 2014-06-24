@@ -65,11 +65,12 @@
   </test>
   <test id="167">
     <address>test@test.com</address>
-    <comment>test.com has an A-record but not an MX-record</comment>
+    <comment>When the test suite was originally constructed, test.com had an A-record but not an MX-record. However, now (June 2014) test.com has started to respond with an MX-record as well. The test has since been marked flaky.</comment>
     <category>ISEMAIL_DNSWARN</category>
     <diagnosis>ISEMAIL_DNSWARN_NO_MX_RECORD</diagnosis>
     <source>Dominic Sayers</source>
     <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+    <flaky>True</flaky>
   </test>
   <test id="168">
     <address>test@nic.no</address>
@@ -85,6 +86,22 @@
     <comment>For full coverage, test a known working example, in this case, gmail.com.</comment>
     <category>ISEMAIL_VALID_CATEGORY</category>
     <diagnosis>ISEMAIL_VALID</diagnosis>
+    <source>Michael Herold</source>
+    <sourcelink>http://github.com/michaelherold/pyIsEmail</sourcelink>
+  </test>
+  <test id="170">
+    <address>08.00.27.d1.8c.d2@virtualbox</address>
+    <comment>This example was not giving the correct diagnosis, as it was falling back to an RFC5321 TLD diagnosis.</comment>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_RECORD</diagnosis>
+    <source>Nguyễn Hồng Quân</source>
+    <sourcelink>https://github.com/michaelherold/pyIsEmail/issues/2</sourcelink>
+  </test>
+  <test id="171">
+    <address>test@example.com</address>
+    <comment>example.com has an A-record but not an MX-record</comment>
+    <category>ISEMAIL_DNSWARN</category>
+    <diagnosis>ISEMAIL_DNSWARN_NO_MX_RECORD</diagnosis>
     <source>Michael Herold</source>
     <sourcelink>http://github.com/michaelherold/pyIsEmail</sourcelink>
   </test>

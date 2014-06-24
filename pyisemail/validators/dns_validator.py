@@ -41,6 +41,12 @@ class DNSValidator(object):
         except (dns.resolver.NXDOMAIN, dns.name.NameTooLong):
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis('NO_RECORD'))
+
+            # Since dns.resolver gives more information than the PHP analog, we
+            # can say that TLDs that throw an NXDOMAIN or NameTooLong error
+            # have been checked
+            if len(domain.split('.')) == 1:
+                dns_checked = True
         except dns.resolver.NoAnswer:
             # MX-record for domain can't be found
             return_status.append(DNSDiagnosis('NO_MX_RECORD'))

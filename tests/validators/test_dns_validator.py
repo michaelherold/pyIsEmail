@@ -54,6 +54,7 @@ class DNSValidatorFlakyTest(TestWithScenarios):
 
     scenarios = get_scenarios("dns-tests.xml", flaky=True)
 
+    @expectedFailure
     def test_without_diagnosis(self):
 
         v = DNSValidator()
