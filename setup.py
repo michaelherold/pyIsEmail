@@ -23,6 +23,7 @@ if sys.version_info[0] == 2:
 elif sys.version_info[0] == 3:
     dnspython = "dnspython3"
 
+
 def get_version():
     basedir = os.path.dirname(__file__)
     with open(os.path.join(basedir, 'pyisemail/version.py')) as f:
@@ -41,7 +42,9 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Operating System :: OS Independent",
         "Topic :: Communications :: Email",
         "Topic :: Software Development :: Libraries :: Python Modules",
