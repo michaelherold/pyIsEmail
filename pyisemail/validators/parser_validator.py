@@ -118,9 +118,9 @@ class ParserValidator(EmailValidator):
             while repeat:
                 repeat = False
 
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Local part
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 if context == Context.LOCALPART:
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
                     #   local-part     =  dot-atom / quoted-string /
@@ -219,10 +219,11 @@ class ParserValidator(EmailValidator):
                             if element_count == 0:
                                 return_status.append(CFWSDiagnosis('FWS'))
                             else:
-                                return_status.append(DeprecatedDiagnosis('FWS'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('FWS'))
                         else:
-                            # We can't start FWS in the middle of an element, so
-                            # this better be the end
+                            # We can't start FWS in the middle of an element,
+                            # so this better be the end
                             end_or_die = True
 
                         context_stack.append(context)
@@ -313,9 +314,9 @@ class ParserValidator(EmailValidator):
                             parse_data[Context.LOCALPART] += token
                             atom_list[Context.LOCALPART][element_count] += token
                             element_len += 1
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Domain
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.DOMAIN:
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
                     #   domain         = dot-atom / domain-literal / obs-domain
@@ -351,24 +352,24 @@ class ParserValidator(EmailValidator):
                     #
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
                     #      Note: A liberal syntax for the domain portion of
-                    #      addr-spec is given here.  However, the domain portion
-                    #      contains addressing information specified by and used
-                    #      in other protocols (e.g., RFC 1034, RFC 1035, RFC
-                    #      1123, RFC5321).  It is therefore incumbent upon
-                    #      implementations to conform to the syntax of addresses
-                    #      for the context in which they are used.
+                    #      addr-spec is given here. However, the domain portion
+                    #      contains addressing information specified by and
+                    #      used in other protocols (e.g., RFC 1034, RFC 1035,
+                    #      RFC 1123, RFC5321). It is therefore incumbent upon
+                    #      implementations to conform to the syntax of
+                    #      addresse for the context in which they are used.
                     # is_email() author's note: it's not clear how to interpret
                     # this in the context of a general address address
                     # validator. The conclusion I have reached is this:
-                    # "addressing information" must comply with RFC 5321 (and in
-                    # turn RFC 1035), anything that is "semantically invisible"
-                    # must comply only with RFC 5322.
+                    # "addressing information" must comply with RFC 5321 (and
+                    # in turn RFC 1035), anything that is "semantically
+                    # invisible" must comply only with RFC 5322.
 
                     # Comment
                     if token == Char.OPENPARENTHESIS:
                         if element_len == 0:
-                            # Comments at the start of the domain are deprecated
-                            # in the text
+                            # Comments at the start of the domain are
+                            # deprecated in the text
                             # Comments at the start of a subdomain are
                             # obs-domain
                             # (http://tools.ietf.org/html/rfc5322#section-3.4.1)
@@ -404,14 +405,14 @@ class ParserValidator(EmailValidator):
                             # Nowhere in RFC 5321 does it say explicitly that
                             # the domain part of a Mailbox must be a valid
                             # domain according to the DNS standards set out in
-                            # RFC 1035, but this *is* implied in several places.
-                            # For instance, wherever the idea of host routing is
-                            # discussed the RFC says that the domain must be
-                            # looked up in the DNS. This would be nonsense
-                            # unless the domain was designed to be a valid DNS
-                            # domain. Hence we must conclude that the RFC 1035
-                            # restriction on label length also applies to RFC
-                            # 5321 domains.
+                            # RFC 1035, but this *is* implied in several
+                            # places. For instance, wherever the idea of host
+                            # routing is discussed the RFC says that the domain
+                            # must be looked up in the DNS. This would be
+                            # nonsense unless the domain was designed to be a
+                            # valid DNS domain. Hence we must conclude that the
+                            # RFC 1035 restriction on label length also applies
+                            # to RFC 5321 domains.
                             #
                             # http://tools.ietf.org/html/rfc1035#section-2.3.4
                             # labels         63 octets or less
@@ -461,11 +462,12 @@ class ParserValidator(EmailValidator):
                                 return_status.append(
                                     DeprecatedDiagnosis('CFWS_NEAR_AT'))
                             else:
-                                return_status.append(DeprecatedDiagnosis('FWS'))
+                                return_status.append(
+                                    DeprecatedDiagnosis('FWS'))
                         else:
                             return_status.append(CFWSDiagnosis('FWS'))
-                            # We can't start FWS in the middle of an element, so
-                            # this better be the end
+                            # We can't start FWS in the middle of an element,
+                            # so this better be the end
                             end_or_die = True
 
                         context_stack.append(context)
@@ -487,8 +489,8 @@ class ParserValidator(EmailValidator):
                         #              "|" / "}" /
                         #              "~"
 
-                        # But RFC 5321 only allows letter-digit-hyphen to comply
-                        # with DNS rules (RFCs 1034 & 1123)
+                        # But RFC 5321 only allows letter-digit-hyphen to
+                        # comply with DNS rules (RFCs 1034 & 1123)
                         # http://tools.ietf.org/html/rfc5321#section-4.1.2
                         #   sub-domain     = Let-dig [Ldh-str]
                         #
@@ -530,15 +532,16 @@ class ParserValidator(EmailValidator):
 
                             hyphen_flag = True
                         elif not (47 < o < 58 or 64 < o < 91 or 96 < o < 123):
-                            # Not an RFC 5321 subdomain, but still OK by RFC5322
+                            # Not an RFC 5321 subdomain, but still OK by RFC
+                            # 5322
                             return_status.append(RFC5322Diagnosis('DOMAIN'))
 
                         parse_data[Context.DOMAIN] += token
                         atom_list[Context.DOMAIN][element_count] += token
                         element_len += 1
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Domain literal
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.LITERAL:
                     # http://tools.ietf.org/html/rfc5322#section-3.4.1
                     #   domain-literal = [CFWS]
@@ -578,41 +581,41 @@ class ParserValidator(EmailValidator):
                             #                     ; Standards-Track RFC and
                             #                     ; registered with IANA
                             #
-                            #   dcontent       = %d33-90 / ; Printable US-ASCII
-                            #                    %d94-126  ; excl. "[", "\", "]"
+                            #   dcontent     = %d33-90 / ; Printable US-ASCII
+                            #                  %d94-126  ; excl. "[", "\", "]"
                             #
-                            #   Snum           = 1*3DIGIT
-                            #                  ; representing a decimal integer
-                            #                  ; value in the range 0-255
+                            #   Snum         = 1*3DIGIT
+                            #                ; representing a decimal integer
+                            #                ; value in the range 0-255
                             #
-                            #   IPv6-addr      = IPv6-full / IPv6-comp /
-                            #                    IPv6v4-full / IPv6v4-comp
+                            #   IPv6-addr    = IPv6-full / IPv6-comp /
+                            #                  IPv6v4-full / IPv6v4-comp
                             #
-                            #   IPv6-hex       = 1*4HEXDIG
+                            #   IPv6-hex     = 1*4HEXDIG
                             #
-                            #   IPv6-full      = IPv6-hex 7(":" IPv6-hex)
+                            #   IPv6-full    = IPv6-hex 7(":" IPv6-hex)
                             #
-                            #   IPv6-comp      = [IPv6-hex *5(":" IPv6-hex)]
-                            #                    "::"
-                            #                    [IPv6-hex *5(":" IPv6-hex)]
-                            #                  ; The "::" represents at least 2
-                            #                  ; 16-bit groups of zeros. No more
-                            #                  ; than 6 groups in addition to
-                            #                  ; the "::" may be present.
+                            #   IPv6-comp    = [IPv6-hex *5(":" IPv6-hex)]
+                            #                  "::"
+                            #                  [IPv6-hex *5(":" IPv6-hex)]
+                            #                ; The "::" represents at least 2
+                            #                ; 16-bit groups of zeros. No more
+                            #                ; than 6 groups in addition to
+                            #                ; the "::" may be present.
                             #
-                            #   IPv6v4-full    = IPv6-hex 5(":" IPv6-hex) ":"
-                            #                    IPv4-address-literal
+                            #   IPv6v4-full  = IPv6-hex 5(":" IPv6-hex) ":"
+                            #                  IPv4-address-literal
                             #
-                            #   IPv6v4-comp    = [IPv6-hex *3(":" IPv6-hex)]
-                            #                    "::"
-                            #                    [IPv6-hex *3(":" IPv6-hex) ":"]
-                            #                    IPv4-address-literal
-                            #                  ; The "::" represents at least 2
-                            #                  ; 16-bit groups of zeros. No more
-                            #                  ; than 4 groups in addition to
-                            #                  ; the "::" and
-                            #                  ; IPv4-address-literal may be
-                            #                  ; present.
+                            #   IPv6v4-comp  = [IPv6-hex *3(":" IPv6-hex)]
+                            #                  "::"
+                            #                  [IPv6-hex *3(":" IPv6-hex) ":"]
+                            #                  IPv4-address-literal
+                            #                ; The "::" represents at least 2
+                            #                ; 16-bit groups of zeros. No more
+                            #                ; than 4 groups in addition to
+                            #                ; the "::" and
+                            #                ; IPv4-address-literal may be
+                            #                ; present.
 
                             max_groups = 8
                             index = False
@@ -626,7 +629,8 @@ class ParserValidator(EmailValidator):
                             )
                             match_ip = re.search(regex, address_literal)
                             if match_ip:
-                                index = address_literal.rfind(match_ip.group(0))
+                                index = address_literal.rfind(
+                                    match_ip.group(0))
                                 if index != 0:
                                     # Convert IPv4 part to IPv6 format for
                                     # further testing
@@ -649,33 +653,31 @@ class ParserValidator(EmailValidator):
                                 index = ipv6.find(Char.DOUBLECOLON)
 
                                 if index == -1:
-                                    # we need exactly the right number of groups
+                                    # We need exactly the right number of
+                                    # groups
                                     if grp_count != max_groups:
                                         return_status.append(
-                                            RFC5322Diagnosis('IPV6_GRPCOUNT')
-                                        )
+                                            RFC5322Diagnosis('IPV6_GRPCOUNT'))
                                 else:
                                     if index != ipv6.rfind(Char.DOUBLECOLON):
                                         return_status.append(
-                                            RFC5322Diagnosis('IPV6_2X2XCOLON')
-                                        )
+                                            RFC5322Diagnosis('IPV6_2X2XCOLON'))
                                     else:
-                                        if index == 0 or index == len(ipv6) - 2:
-                                            # RFC 4291 allows :: at the start or
-                                            # end of an address with 7 other
+                                        if index in [0, len(ipv6) - 2]:
+                                            # RFC 4291 allows :: at the start
+                                            # or end of an address with 7 other
                                             # groups in addition
                                             max_groups += 1
 
                                         if grp_count > max_groups:
                                             return_status.append(
-                                                RFC5322Diagnosis('IPV6_MAXGRPS')
-                                            )
+                                                RFC5322Diagnosis(
+                                                    'IPV6_MAXGRPS'))
                                         elif grp_count == max_groups:
                                             # Eliding a single "::"
                                             return_status.append(
                                                 RFC5321Diagnosis(
-                                                    'IPV6DEPRECATED')
-                                            )
+                                                    'IPV6DEPRECATED'))
 
                                 # Revision 2.7: Daniel Marschall's new IPv6
                                 # testing strategy
@@ -739,10 +741,11 @@ class ParserValidator(EmailValidator):
                         #   obs-dtext     = obs-NO-WS-CTL / quoted-pair
                         #
                         #   obs-NO-WS-CTL = %d1-8 /     ; US-ASCII control
-                        #                   %d11 /      ; characters that do not
-                        #                   %d12 /      ; include the carriage
-                        #                   %d14-31 /   ; return, line feed, and
-                        #                   %d127       ; white space characters
+                        #                   %d11 /      ; characters that do
+                        #                   %d12 /      ; not include the
+                        #                   %d14-31 /   ; carriage return, line
+                        #                   %d127       ; feed, and white space
+                        #                               ; characters
                         o = ord(token)
 
                         # CR, LF, SP & HTAB have already been parsed above
@@ -759,9 +762,9 @@ class ParserValidator(EmailValidator):
                         parse_data[Context.DOMAIN] += token
                         atom_list[Context.DOMAIN][element_count] += token
                         element_len += 1
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Quoted string
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.QUOTEDSTRING:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.4
                     #   quoted-string   =  [CFWS]
@@ -819,8 +822,9 @@ class ParserValidator(EmailValidator):
                         # http://tools.ietf.org/html/rfc5322#section-3.2.4
                         #   qtext          =  %d33 /      ; Printable US-ASCII
                         #                     %d35-91 /   ; characters not
-                        #                     %d93-126 /  ; including "\" or the
-                        #                     obs-qtext   ; quote character
+                        #                     %d93-126 /  ; including "\" or
+                        #                     obs-qtext   ; the quote
+                        #                                 ; character
                         #
                         #   obs-qtext      =  obs-NO-WS-CTL
                         #
@@ -842,9 +846,9 @@ class ParserValidator(EmailValidator):
                         parse_data[Context.LOCALPART] += token
                         atom_list[Context.LOCALPART][element_count] += token
                         element_len += 1
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Quoted pair
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.QUOTEDPAIR:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.1
                     #   quoted-pair     =   ("\" (VCHAR / WSP)) / obs-qp
@@ -857,10 +861,10 @@ class ParserValidator(EmailValidator):
                     #   obs-qp          =   "\" (%d0 / obs-NO-WS-CTL / LF / CR)
                     #
                     #   obs-NO-WS-CTL   =   %d1-8 /    ; US-ASCII control
-                    #                       %d11 /     ;  characters that do not
-                    #                       %d12 /     ;  include the carriage
-                    #                       %d14-31 /  ;  return, line feed, and
-                    #                       %d127      ;  white space characters
+                    #                       %d11 /     ; characters that do not
+                    #                       %d12 /     ; include the carriage
+                    #                       %d14-31 /  ; return, line feed, and
+                    #                       %d127      ; white space characters
                     #
                     # i.e. obs-qp       =  "\" (%d0-8, %d10-31 / %d127)
 
@@ -903,9 +907,9 @@ class ParserValidator(EmailValidator):
                             return InvalidDiagnosis('BAD_PARSE')
                         else:
                             return False
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Comment
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.COMMENT:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.2
                     #   comment         =   "(" *([FWS] ccontent) [FWS] ")"
@@ -946,10 +950,10 @@ class ParserValidator(EmailValidator):
                     # ctext
                     else:
                         # http://tools.ietf.org/html/rfc5322#section-3.2.3
-                        #   ctext           =   %d33-39 /   ; Printable US-ASCII
-                        #                       %d42-91 /   ; characters not
-                        #                       %d93-126 /  ; including (, ),
-                        #                       obs-ctext   ; or \
+                        #   ctext           =   %d33-39 /   ; Printable US-
+                        #                       %d42-91 /   ; ASCII characters
+                        #                       %d93-126 /  ; not including
+                        #                       obs-ctext   ; "(", ")", or "\"
                         #
                         #   obs-ctext       =   obs-NO-WS-CTL
                         #
@@ -970,9 +974,9 @@ class ParserValidator(EmailValidator):
                         elif o < 32 or o == 127:
                             return_status.append(DeprecatedDiagnosis('CTEXT'))
 
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # Folding White Space (FWS)
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 elif context == Context.FWS:
                     # http://tools.ietf.org/html/rfc5322#section-3.2.2
                     #   FWS             =   ([*WSP CRLF] 1*WSP) /  obs-FWS
@@ -981,11 +985,11 @@ class ParserValidator(EmailValidator):
                     # But note the erratum:
                     # http://www.rfc-editor.org/errata_search.php?rfc=5322&eid=1908
                     #   In the obsolete syntax, any amount of folding white
-                    #   space MAY be inserted where the obs-FWS rule is allowed.
-                    #   This creates the possibility of having two consecutive
-                    #   "folds" in a line, and therefore the possibility that a
-                    #   line which makes up a folded header field could be
-                    #   composed entirely of white space.
+                    #   space MAY be inserted where the obs-FWS rule is
+                    #   allowed. This creates the possibility of having two
+                    #   consecutive "folds" in a line, and therefore the
+                    #   possibility that a line which makes up a folded header
+                    #   field could be composed entirely of white space.
                     #
                     #   obs-FWS         =   1*([CRLF] WSP)
 
@@ -1035,9 +1039,9 @@ class ParserValidator(EmailValidator):
 
                     token_prior = token
 
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 # A context we aren't expecting
-                #--------------------------------------------------------
+                # -------------------------------------------------------
                 else:  # pragma: no cover
                     if diagnose:
                         return InvalidDiagnosis('BAD_PARSE')
@@ -1075,7 +1079,7 @@ class ParserValidator(EmailValidator):
                 # Fatal error
                 return_status.append(InvalidDiagnosis('DOMAINHYPHENEND'))
             # http://tools.ietf.org/html/rfc5321#section-4.5.3.1.2
-            # The maximum total length of a domain name or number is 255 octets.
+            # The maximum total length of a domain name or number is 255 octets
             elif len(parse_data[Context.DOMAIN]) > 255:
                 return_status.append(RFC5322Diagnosis('DOMAIN_TOOLONG'))
             # http://tools.ietf.org/html/rfc5321#section-4.1.2
@@ -1087,9 +1091,9 @@ class ParserValidator(EmailValidator):
             #   The maximum total length of a reverse-path or forward-path is
             #   256 octets (including the punctuation and element separators).
             #
-            # Thus, even without (obsolete) routing information, the Mailbox can
-            # only be 254 characters long. This is confirmed by this verified
-            # erratum to RFC 3696:
+            # Thus, even without (obsolete) routing information, the Mailbox
+            # can only be 254 characters long. This is confirmed by this
+            # verified erratum to RFC 3696:
             #
             # http://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1690
             #   However, there is a restriction in RFC 2821 on the length of an

@@ -68,7 +68,7 @@ class DNSValidator(object):
         #
         # http://tools.ietf.org/html/rfc5321#section-2.3.5
         #   In the case of a top-level domain used by itself in an address, a
-        #   single string is used without any dots.  This makes the requirement,
+        #   single string is used without any dots. This makes the requirement,
         #   described in more detail below, that only fully-qualified domain
         #   names appear in SMTP transactions on the public Internet,
         #   particularly important where top-level domains are involved.
@@ -88,7 +88,8 @@ class DNSValidator(object):
         # http://www.rfc-editor.org/errata_search.php?rfc=1123&eid=1353
         #   However, a valid host name can never have the dotted-decimal
         #   form #.#.#.#, since this change does not permit the highest-level
-        #   component label to start with a digit even if it is not all-numeric.
+        #   component label to start with a digit even if it is not
+        #   all-numeric.
         if not dns_checked:
             atom_list = domain.split(".")
             if len(atom_list) == 1:

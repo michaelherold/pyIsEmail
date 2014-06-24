@@ -1,9 +1,10 @@
 import os
 import sys
 import xml.etree.ElementTree as ET
-from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis, DNSDiagnosis
-from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
-from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
+from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis
+from pyisemail.diagnosis import DNSDiagnosis, InvalidDiagnosis
+from pyisemail.diagnosis import RFC5321Diagnosis, RFC5322Diagnosis
+from pyisemail.diagnosis import ValidDiagnosis
 
 __all__ = ["create_diagnosis", "get_scenarios"]
 
@@ -41,7 +42,8 @@ def get_scenarios(filename, flaky=False):
 
     """
 
-    document = ET.parse("%s/../data/%s" % (os.path.dirname(__file__), filename))
+    document = ET.parse("%s/../data/%s" % (
+        os.path.dirname(__file__), filename))
     root = document.getroot()
 
     scenarios = []
