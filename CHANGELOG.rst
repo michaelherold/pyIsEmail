@@ -1,3 +1,11 @@
+1.2.0 (2015-03-13)
+------------------
+
+- Removed dependency on pypandoc for building. This should fix any user
+  installation issues. [`60a4d6`_] - `@michaelherold`_.
+
+.. _60a4d6: https://github.com/michaelherold/pyIsEmail/commit/60a4d65906736593a6c2547065ad0d5b0024aaec
+
 1.1.0 (2014-07-14)
 ------------------
 
