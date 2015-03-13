@@ -8,16 +8,6 @@ from setuptools import setup
 
 kwargs = {}
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except (IOError, ImportError):
-    try:
-        with open('README.md', 'r') as f:
-            long_description = f.read()
-    except IOError:  # For tox
-        long_description = ""
-
 if sys.version_info[0] == 2:
     dnspython = "dnspython"
 elif sys.version_info[0] == 3:
@@ -36,7 +26,7 @@ setup(
     name="pyIsEmail",
     version=get_version(),
     description="Simple, robust email validation",
-    long_description=long_description,
+    long_description=open('README.rst').read(),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -63,7 +53,6 @@ setup(
     install_requires=[
         "%s >= 1.10.0" % dnspython,
     ],
-    setup_requires=["pypandoc >= 0.7.0"],
     tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
     test_suite="tests",
     **kwargs
