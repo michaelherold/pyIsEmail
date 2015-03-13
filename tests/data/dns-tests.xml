@@ -58,10 +58,12 @@
   </test>
   <test id="166">
     <address>test@org</address>
+    <comment>dnspython has since started to return a NO_RECORD exception for the org TLD (March 2015). The dig tool is able to correctly return the TLD's MX record though, so that seems to be an error. This isn't a particularly useful test, so marking it as flaky.</comment>
     <category>ISEMAIL_RFC5321</category>
     <diagnosis>ISEMAIL_RFC5321_TLD</diagnosis>
     <source>Dominic Sayers</source>
     <sourcelink>http://www.dominicsayers.com/isemail</sourcelink>
+    <flaky>True</flaky>
   </test>
   <test id="167">
     <address>test@test.com</address>
