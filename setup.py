@@ -53,7 +53,11 @@ setup(
     install_requires=[
         "%s >= 1.10.0" % dnspython,
     ],
-    tests_require=["testtools >= 0.9.21", "testscenarios >= 0.3"],
+    tests_require=[
+        "coverage",
+        "testtools >= 0.9.21",
+        "testscenarios >= 0.3"
+    ],
     test_suite="tests",
     **kwargs
 )
