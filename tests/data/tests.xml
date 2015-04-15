@@ -223,6 +223,11 @@ Date       Tests        Version Notes
     <diagnosis>ISEMAIL_VALID</diagnosis>
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
+    <flaky>True</flaky>
+    <comment>
+      Marked as flaky on 2015-04-15. It seems the DNS record(s) have
+      been removed for this domain, so it is not expected to pass anymore.
+    </comment>
   </test>
   <test id="34">
     <address>test@.iana.org</address>
@@ -449,7 +454,7 @@ Date       Tests        Version Notes
     <diagnosis>ISEMAIL_RFC5322_IPV6_GRPCOUNT</diagnosis>
     <source>Michael Rushton</source>
     <sourcelink>http://squiloople.com/tag/email/</sourcelink>
-    
+
   </test>
   <test id="68">
     <address>test@[IPv6:1111:2222:3333:4444:5555:6666:7777:8888]</address>
