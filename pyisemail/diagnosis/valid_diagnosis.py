@@ -12,7 +12,7 @@ class ValidDiagnosis(BaseDiagnosis):
     MESSAGE = ("Address is valid. Please note that this does not mean "
                "the address actually exists, nor even that the domain "
                "actually exists. This address could be issued by the "
-               "domain owner without braking the rules of any RFCs.")
+               "domain owner without breaking the rules of any RFCs.")
 
     def __init__(self, diagnosis_type='VALID'):
         self.diagnosis_type = diagnosis_type
