@@ -1,8 +1,19 @@
+1.3.0 (2015-04-18)
+------------------
+
+- Bugfix: Ensures that DNS checks fail context with or without
+  a diagnosis [`c7b91f6`_] - `@michaelherold`_.
+- The DNSValidator now fails checks when a query times out or fails to
+  return a response from any nameserver [`f8f4af7`_] - `@michaelherold`_.
+
+.. _c7b91f6: https://github.com/michaelherold/pyIsEmail/commit/c7b91f64b87b88a501628bb73cc6777b10e45ba5
+.. _f8f4af7: https://github.com/michaelherold/pyIsEmail/commit/f8f4af7b4b2441c81a442f41b977ce8780f129a4
+
 1.2.0 (2015-03-13)
 ------------------
 
 - Removed dependency on pypandoc for building. This should fix any user
-  installation issues. [`60a4d6`_] - `@michaelherold`_.
+  installation issues [`60a4d6`_] - `@michaelherold`_.
 
 .. _60a4d6: https://github.com/michaelherold/pyIsEmail/commit/60a4d65906736593a6c2547065ad0d5b0024aaec
 
