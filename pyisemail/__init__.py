@@ -19,8 +19,10 @@ def is_email(address, check_dns=False, diagnose=False):
 
     """
 
+    threshold = BaseDiagnosis.CATEGORIES["THRESHOLD"]
     d = ParserValidator().is_email(address, True)
     if check_dns is True and d < BaseDiagnosis.CATEGORIES["DNSWARN"]:
+        threshold = BaseDiagnosis.CATEGORIES["VALID"]
         d = max(d, DNSValidator().is_valid(address.split("@")[1], True))
 
-    return d if diagnose else d < BaseDiagnosis.CATEGORIES["THRESHOLD"]
+    return d if diagnose else d < threshold
