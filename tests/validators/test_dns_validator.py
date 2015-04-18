@@ -1,87 +1,115 @@
-from unittest import expectedFailure
-from testscenarios import TestWithScenarios
-from pyisemail.diagnosis import ValidDiagnosis
+import unittest
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+import dns.resolver
+import dns.name
+from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 from pyisemail.validators import DNSValidator
-from tests.validators import create_diagnosis, get_scenarios
 
 
-class DNSValidatorTest(TestWithScenarios):
+class DNSValidatorTestCase(unittest.TestCase):
+    def setUp(self):
+        self.validator = DNSValidator()
+        self.is_valid = self.validator.is_valid
 
-    scenarios = get_scenarios("dns-tests.xml")
 
-    def test_without_diagnosis(self):
+@patch('dns.resolver.query')
+class TestWorkingMXRecordTestCase(DNSValidatorTestCase):
 
-        v = DNSValidator()
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), True)
 
-        domain = self.address.split("@")[1]
-        result = v.is_valid(domain)
-        expected = create_diagnosis(self.diagnosis) == ValidDiagnosis()
-
+    def testWithDiagnosis(self, mocked_method):
         self.assertEqual(
-            result,
-            expected,
-            ("%s (%s): Got %s, but expected %s."
-             % (self.id, domain, result, expected))
-        )
+            self.is_valid('example.com', diagnose=True),
+            ValidDiagnosis())
 
-    def test_with_diagnosis(self):
 
-        v = DNSValidator()
+@patch('dns.resolver.query', side_effect=dns.resolver.NXDOMAIN)
+class TestNonExistantDomainTestCase(DNSValidatorTestCase):
 
-        domain = self.address.split("@")[1]
-        result = v.is_valid(domain, True)
-        expected = create_diagnosis(self.diagnosis)
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
 
+    def testWithDiagnosis(self, mocked_method):
         self.assertEqual(
-            result,
-            expected,
-            ("%s (%s): Got %s, but expected %s."
-             % (self.id, domain, result, expected))
-        )
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('NO_RECORD'))
 
 
-class DNSValidatorFlakyTest(TestWithScenarios):
+@patch('dns.resolver.query', side_effect=dns.name.NameTooLong)
+class TestDomainTooLongTestCase(DNSValidatorTestCase):
 
-    """Test suite for flaky DNSValidator tests.
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
 
-    Due to different DNS servers handling missing domains differently, these
-    tests are marked as flaky. A flaky tests might succeed in one environment
-    and fail in another, purely due to DNS issues. An ideal fix for this
-    behavior would be to mock the DNS check to alleviate this problem, but for
-    now this will have to do.
-
-    """
-
-    scenarios = get_scenarios("dns-tests.xml", flaky=True)
-
-    @expectedFailure
-    def test_without_diagnosis(self):
-
-        v = DNSValidator()
-
-        domain = self.address.split("@")[1]
-        result = v.is_valid(domain)
-        expected = create_diagnosis(self.diagnosis) == ValidDiagnosis()
-
+    def testWithDiagnosis(self, mocked_method):
         self.assertEqual(
-            result,
-            expected,
-            ("%s (%s): Got %s, but expected %s."
-             % (self.id, domain, result, expected))
-        )
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('NO_RECORD'))
 
-    @expectedFailure
-    def test_with_diagnosis(self):
 
-        v = DNSValidator()
+@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
+class TestNoMxOrARecordsTestCase(DNSValidatorTestCase):
 
-        domain = self.address.split("@")[1]
-        result = v.is_valid(domain, True)
-        expected = create_diagnosis(self.diagnosis)
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
 
+    def testWithDiagnosis(self, mocked_method):
         self.assertEqual(
-            result,
-            expected,
-            ("%s (%s): Got %s, but expected %s."
-             % (self.id, domain, result, expected))
-        )
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('NO_RECORD'))
+
+
+@patch('dns.resolver.query', side_effect=[dns.resolver.NoAnswer, None])
+class TestNoMxWithARecordTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('NO_MX_RECORD'))
+
+
+@patch('dns.resolver.query', side_effect=dns.resolver.NXDOMAIN)
+class TestNoMxOnTldTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('com'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('com', diagnose=True),
+            DNSDiagnosis('NO_RECORD'))
+
+
+@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
+class TestNoRecordsOnTldTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('com'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('com', diagnose=True),
+            RFC5321Diagnosis('TLD'))
+
+
+@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
+class TestNoRecordsOnNumericTldTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('iana.123'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('iana.123', diagnose=True),
+            RFC5321Diagnosis('TLDNUMERIC'))
+
+
+if __name__ == '__main__':
+    unittest.run()
