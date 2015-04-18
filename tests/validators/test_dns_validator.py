@@ -3,8 +3,8 @@ try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
-import dns.resolver
 import dns.name
+import dns.resolver
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 from pyisemail.validators import DNSValidator
 
@@ -109,6 +109,30 @@ class TestNoRecordsOnNumericTldTestCase(DNSValidatorTestCase):
         self.assertEqual(
             self.is_valid('iana.123', diagnose=True),
             RFC5321Diagnosis('TLDNUMERIC'))
+
+
+@patch('dns.resolver.query', side_effect=dns.resolver.NoNameservers)
+class NoNameserversRespondTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('NO_NAMESERVERS'))
+
+
+@patch('dns.resolver.query', side_effect=dns.resolver.Timeout)
+class DNSTimeoutTestCase(DNSValidatorTestCase):
+
+    def testWithoutDiagnosis(self, mocked_method):
+        self.assertEqual(self.is_valid('example.com'), False)
+
+    def testWithDiagnosis(self, mocked_method):
+        self.assertEqual(
+            self.is_valid('example.com', diagnose=True),
+            DNSDiagnosis('DNS_TIMEDOUT'))
 
 
 if __name__ == '__main__':

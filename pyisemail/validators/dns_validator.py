@@ -1,3 +1,4 @@
+import dns.exception
 import dns.resolver
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
@@ -57,6 +58,10 @@ class DNSValidator(object):
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
                 return_status.append(DNSDiagnosis('NO_RECORD'))
+        except dns.resolver.NoNameservers:
+            return_status.append(DNSDiagnosis('NO_NAMESERVERS'))
+        except (dns.exception.Timeout, dns.resolver.Timeout):
+            return_status.append(DNSDiagnosis('DNS_TIMEDOUT'))
 
         # Check for TLD addresses
         # -----------------------
