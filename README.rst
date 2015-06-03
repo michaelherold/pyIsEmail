@@ -30,7 +30,7 @@ Install from PyPI using `pip`_, a package manager for Python.
 
     $ pip install pyIsEmail
 
-Don't have pip installed? Try installingit by running this from the
+Don't have pip installed? Try installing it by running this from the
 command line:
 
 .. code-block:: bash
