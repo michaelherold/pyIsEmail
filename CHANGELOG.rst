@@ -1,3 +1,8 @@
+1.3.1 (2015-09-18)
+------------------
+
+- Release as non-universal wheels because of the dnspython dependency.
+
 1.3.0 (2015-04-18)
 ------------------
 
