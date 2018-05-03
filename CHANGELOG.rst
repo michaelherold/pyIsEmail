@@ -1,3 +1,8 @@
+Unreleased
+----------
+
+- Upgrade to universal dnspython version
+
 1.3.1 (2015-09-18)
 ------------------
 
