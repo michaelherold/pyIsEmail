@@ -8,11 +8,6 @@ from setuptools import setup
 
 kwargs = {}
 
-if sys.version_info[0] == 2:
-    dnspython = "dnspython"
-elif sys.version_info[0] == 3:
-    dnspython = "dnspython3"
-
 
 def get_version():
     basedir = os.path.dirname(__file__)
@@ -64,7 +59,7 @@ setup(
     },
     zip_safe=False,
     install_requires=[
-        "%s >= 1.10.0" % dnspython,
+        "dnspython >= 1.15.0",
     ],
     tests_require=tests_require(),
     test_suite="tests",
