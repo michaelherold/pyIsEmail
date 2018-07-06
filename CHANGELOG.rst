@@ -1,4 +1,4 @@
-Unreleased
+1.3.2 (2018-07-05)
 ----------
 
 - Upgrade to universal dnspython version - `@peterdemin`_.
