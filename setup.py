@@ -49,7 +49,7 @@ setup(
     ],
     keywords=['email', 'validation'],
     author="Michael Herold",
-    author_email="michael.j.herold@gmail.com",
+    author_email="opensource@michaeljherold.com",
     url="https://github.com/michaelherold/pyIsEmail",
     license="MIT",
     packages=["pyisemail", "pyisemail.diagnosis", "pyisemail.validators"],
