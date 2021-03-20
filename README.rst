@@ -1,7 +1,7 @@
 pyIsEmail
 =========
 
-|pypi| |travis| |coveralls| |downloads|
+|pypi| |ci| |coveralls| |downloads|
 
 Getting Started
 ---------------
@@ -129,8 +129,8 @@ Copyright (c) 2015 Michael Herold. Open sourced under the terms of the
 .. |pypi| image:: https://img.shields.io/pypi/v/pyIsEmail.svg?style=flat-square
    :target: https://pypi.python.org/pypi/pyIsEmail
    :alt: Latest version released on PyPI
-.. |travis| image:: https://img.shields.io/travis/michaelherold/pyIsEmail/master.svg?style=flat-square
-   :target: http://travis-ci.org/michaelherold/pyIsEmail
+.. |ci| image:: https://github.com/michaelherold/pyIsEmail/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/michaelherold/pyIsEmail/actions/workflows/ci.yml
 .. |coveralls| image:: https://img.shields.io/coveralls/michaelherold/pyIsEmail/master.svg?style=flat-square
    :target: https://coveralls.io/r/michaelherold/pyIsEmail?branch=master
    :alt: Test coverage
