@@ -77,9 +77,22 @@ These are primary indicators of whether an email address can even be
 issued at that domain. However, a valid response here *is not a guarantee
 that the email exists*, merely that is *can* exist.
 
+If you want to limit using a `gTLD`_ as the domain part of the email
+address, you can do so with a flag:
+
+.. code-block:: python
+
+    from pyisemail import is_email
+
+    address = "thiswont@workatall"
+    bool_result_with_check = is_email(address, allow_gtld=False)
+    detailed_result_with_check = is_email(address, allow_gtld=False, diagnose=True)
+
 In addition to the base ``is_email`` functionality, you can also use the
 validators by themselves. Check the validator source doe to see how this
 works.
+
+.. _gTLD: https://en.wikipedia.org/wiki/Generic_top-level_domain
 
 Uninstall
 ---------

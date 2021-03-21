@@ -1,19 +1,25 @@
 from testscenarios import TestWithScenarios
 from unittest import TestCase
+
 try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
 import dns.resolver
 from pyisemail import is_email
-from pyisemail.diagnosis import BaseDiagnosis, DNSDiagnosis
+from pyisemail.diagnosis import (
+    BaseDiagnosis,
+    DNSDiagnosis,
+    GTLDDiagnosis,
+    ValidDiagnosis,
+)
 from tests.validators import create_diagnosis, get_scenarios
 
 
 class IsEmailTest(TestWithScenarios):
 
     scenarios = get_scenarios("tests.xml")
-    threshold = BaseDiagnosis.CATEGORIES['THRESHOLD']
+    threshold = BaseDiagnosis.CATEGORIES["THRESHOLD"]
 
     def test_without_diagnosis(self):
         result = is_email(self.address)
@@ -22,8 +28,10 @@ class IsEmailTest(TestWithScenarios):
         self.assertEqual(
             result,
             expected,
-            ("%s (%s): Got %s, but expected %s."
-             % (self.id, self.address, result, expected))
+            (
+                "%s (%s): Got %s, but expected %s."
+                % (self.id, self.address, result, expected)
+            ),
         )
 
     def test_with_diagnosis(self):
@@ -33,20 +41,33 @@ class IsEmailTest(TestWithScenarios):
         self.assertEqual(
             result,
             expected,
-            ("%s (%s): Got %s, but expected %s."
-                % (self.id, self.address, result, expected))
+            (
+                "%s (%s): Got %s, but expected %s."
+                % (self.id, self.address, result, expected)
+            ),
         )
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
+@patch("dns.resolver.query", side_effect=dns.resolver.NoAnswer)
 class CheckDNSFailureTestCase(TestCase):
-
     def test_without_diagnosis(self, mocked_method):
-        result = is_email('test@example.com', check_dns=True)
+        result = is_email("test@example.com", check_dns=True)
         expected = False
         self.assertEqual(result, expected)
 
     def test_with_diagnosis(self, mocked_method):
-        result = is_email('test@example.com', check_dns=True, diagnose=True)
-        expected = DNSDiagnosis('NO_RECORD')
+        result = is_email("test@example.com", check_dns=True, diagnose=True)
+        expected = DNSDiagnosis("NO_RECORD")
         self.assertEqual(result, expected)
+
+
+class GTLDTest(TestCase):
+    def test_with_diagnosis(self):
+        self.assertTrue(is_email("a@b"))
+        self.assertFalse(is_email("a@b", allow_gtld=False))
+
+    def test_without_diagnosis(self):
+        self.assertEqual(is_email("a@b", diagnose=True), ValidDiagnosis())
+        self.assertEqual(
+            is_email("a@b", allow_gtld=False, diagnose=True), GTLDDiagnosis("GTLD")
+        )
