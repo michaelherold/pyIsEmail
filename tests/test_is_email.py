@@ -1,10 +1,5 @@
-from testscenarios import TestWithScenarios
-from unittest import TestCase
+import pytest
 
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 import dns.resolver
 from pyisemail import is_email
 from pyisemail.diagnosis import (
@@ -15,59 +10,63 @@ from pyisemail.diagnosis import (
 )
 from tests.validators import create_diagnosis, get_scenarios
 
-
-class IsEmailTest(TestWithScenarios):
-
-    scenarios = get_scenarios("tests.xml")
-    threshold = BaseDiagnosis.CATEGORIES["THRESHOLD"]
-
-    def test_without_diagnosis(self):
-        result = is_email(self.address)
-        expected = create_diagnosis(self.diagnosis) < self.threshold
-
-        self.assertEqual(
-            result,
-            expected,
-            (
-                "%s (%s): Got %s, but expected %s."
-                % (self.id, self.address, result, expected)
-            ),
-        )
-
-    def test_with_diagnosis(self):
-        result = is_email(self.address, diagnose=True)
-        expected = create_diagnosis(self.diagnosis)
-
-        self.assertEqual(
-            result,
-            expected,
-            (
-                "%s (%s): Got %s, but expected %s."
-                % (self.id, self.address, result, expected)
-            ),
-        )
+scenarios = get_scenarios("tests.xml")
+threshold = BaseDiagnosis.CATEGORIES["THRESHOLD"]
 
 
-@patch("dns.resolver.query", side_effect=dns.resolver.NoAnswer)
-class CheckDNSFailureTestCase(TestCase):
-    def test_without_diagnosis(self, mocked_method):
-        result = is_email("test@example.com", check_dns=True)
-        expected = False
-        self.assertEqual(result, expected)
-
-    def test_with_diagnosis(self, mocked_method):
-        result = is_email("test@example.com", check_dns=True, diagnose=True)
-        expected = DNSDiagnosis("NO_RECORD")
-        self.assertEqual(result, expected)
+def side_effect(*_):
+    raise dns.resolver.NoAnswer
 
 
-class GTLDTest(TestCase):
-    def test_with_diagnosis(self):
-        self.assertTrue(is_email("a@b"))
-        self.assertFalse(is_email("a@b", allow_gtld=False))
+@pytest.mark.parametrize("test_id,address,diagnosis", scenarios)
+def test_without_diagnosis(test_id, address, diagnosis):
+    result = is_email(address)
+    expected = create_diagnosis(diagnosis) < threshold
 
-    def test_without_diagnosis(self):
-        self.assertEqual(is_email("a@b", diagnose=True), ValidDiagnosis())
-        self.assertEqual(
-            is_email("a@b", allow_gtld=False, diagnose=True), GTLDDiagnosis("GTLD")
-        )
+    assert result == expected, "%s (%s): Got %s, but expected %s." % (
+        test_id,
+        address,
+        result,
+        expected,
+    )
+
+
+@pytest.mark.parametrize("test_id,address,diagnosis", scenarios)
+def test_with_diagnosis(test_id, address, diagnosis):
+    result = is_email(address, diagnose=True)
+    expected = create_diagnosis(diagnosis)
+
+    assert result == expected, "%s (%s): Got %s, but expected %s." % (
+        test_id,
+        address,
+        result,
+        expected,
+    )
+
+
+def test_dns_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", side_effect)
+
+    result = is_email("test@example.com", check_dns=True)
+    expected = False
+
+    assert result == expected
+
+
+def test_dns_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", side_effect)
+
+    result = is_email("test@example.com", check_dns=True, diagnose=True)
+    expected = DNSDiagnosis("NO_RECORD")
+
+    assert result == expected
+
+
+def test_gtld_with_diagnosis():
+    assert is_email("a@b") == True
+    assert is_email("a@b", allow_gtld=False) == False
+
+
+def test_gtld_without_diagnosis():
+    assert is_email("a@b", diagnose=True) == ValidDiagnosis()
+    assert is_email("a@b", allow_gtld=False, diagnose=True) == GTLDDiagnosis("GTLD")

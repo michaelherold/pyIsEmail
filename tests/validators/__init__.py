@@ -42,26 +42,22 @@ def get_scenarios(filename, flaky=False):
 
     """
 
-    document = ET.parse("%s/../data/%s" % (
-        os.path.dirname(__file__), filename))
+    document = ET.parse("%s/../data/%s" % (os.path.dirname(__file__), filename))
     root = document.getroot()
 
     scenarios = []
 
-    for test in root.iter('test'):
-        id = str(test.attrib['id'])
-
-        attrs = {}
-        attrs['id'] = str(test.attrib['id'])
-        attrs['address'] = _get_node_text(test.find('address').text)
-        attrs['diagnosis'] = _get_node_text(test.find('diagnosis').text)
+    for test in root.iter("test"):
+        test_id = str(test.attrib["id"])
+        address = _get_node_text(test.find("address").text)
+        diagnosis = _get_node_text(test.find("diagnosis").text)
         try:
-            attrs['flaky'] = _get_node_text(test.find('flaky').text) == "True"
+            flaky_test = _get_node_text(test.find("flaky").text) == "True"
         except AttributeError:
-            attrs['flaky'] = False
+            flaky_test = False
 
-        if attrs['flaky'] is flaky:
-            scenario = (id, attrs)
+        if flaky_test is flaky:
+            scenario = (test_id, address, diagnosis)
             scenarios.append(scenario)
 
     return scenarios
@@ -79,7 +75,7 @@ def _get_node_text(text):
     if text:
         return _unicode(text)
     else:
-        return ''
+        return ""
 
 
 def _get_diagnosis_class(tag):

@@ -1,36 +1,38 @@
-import unittest
+import pytest
 from pyisemail.diagnosis import BaseDiagnosis
 
 
-class BaseDiagnosisTest(unittest.TestCase):
-    def test_lt(self):
-        d1 = BaseDiagnosis("test")
-        d1.code = 1
-        d2 = BaseDiagnosis("test")
-        d2.code = 2
+def test_diagnosis_less_than():
+    d1 = BaseDiagnosis("test")
+    d1.code = 1
+    d2 = BaseDiagnosis("test")
+    d2.code = 2
 
-        self.assertLess(d1, d2)
-        self.assertLess(d1, 3)
+    assert d1 < d2
+    assert d1 < 3
 
-    def test_gt(self):
-        d1 = BaseDiagnosis("test")
-        d1.code = 1
-        d2 = BaseDiagnosis("test")
-        d2.code = 2
 
-        self.assertGreater(d2, d1)
-        self.assertGreater(3, d1)
+def test_diagnosis_greater_than():
+    d1 = BaseDiagnosis("test")
+    d1.code = 1
+    d2 = BaseDiagnosis("test")
+    d2.code = 2
 
-    def test_eq(self):
-        d1 = BaseDiagnosis("test")
-        d1.code = 1
-        d2 = BaseDiagnosis("test")
-        d2.code = 1
+    assert d2 > d1
+    assert 3 > d1
 
-        self.assertEqual(d1, d2)
 
-    def test_hash(self):
-        d1 = BaseDiagnosis("test")
-        d2 = BaseDiagnosis("test")
+def test_diagnosis_equal_to():
+    d1 = BaseDiagnosis("test")
+    d1.code = 1
+    d2 = BaseDiagnosis("test")
+    d2.code = 1
 
-        self.assertEqual(hash(d1), hash(d2))
+    assert d1 == d2
+
+
+def test_diagnosis_hash():
+    d1 = BaseDiagnosis("test")
+    d2 = BaseDiagnosis("test")
+
+    assert hash(d1) == hash(d2)

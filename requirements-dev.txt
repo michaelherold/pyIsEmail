@@ -1,3 +1,2 @@
-coverage==3.7.1
-testtools>=0.9.21
-testscenarios>=0.3
+coverage==5.5
+pytest==6.2.2
