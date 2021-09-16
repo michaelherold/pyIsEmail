@@ -1,139 +1,140 @@
-import unittest
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+import pytest
 import dns.name
 import dns.resolver
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 from pyisemail.validators import DNSValidator
 
 
-class DNSValidatorTestCase(unittest.TestCase):
-    def setUp(self):
-        self.validator = DNSValidator()
-        self.is_valid = self.validator.is_valid
+is_valid = DNSValidator().is_valid
 
 
-@patch('dns.resolver.query')
-class TestWorkingMXRecordTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), True)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            ValidDiagnosis())
+def no_side_effect(*_):
+    return True
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NXDOMAIN)
-class TestNonExistantDomainTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('NO_RECORD'))
+def nx_domain_side_effect(*_):
+    raise dns.resolver.NXDOMAIN
 
 
-@patch('dns.resolver.query', side_effect=dns.name.NameTooLong)
-class TestDomainTooLongTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('NO_RECORD'))
+def too_long_side_effect(*_):
+    raise dns.name.NameTooLong
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
-class TestNoMxOrARecordsTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('NO_RECORD'))
+def no_record_side_effect(*_):
+    raise dns.resolver.NoAnswer
 
 
-@patch('dns.resolver.query', side_effect=[dns.resolver.NoAnswer, None])
-class TestNoMxWithARecordTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('NO_MX_RECORD'))
+def no_ns_side_effect(*_):
+    raise dns.resolver.NoNameservers
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NXDOMAIN)
-class TestNoMxOnTldTestCase(DNSValidatorTestCase):
-
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('com', diagnose=True),
-            DNSDiagnosis('NO_RECORD'))
+def timeout_side_effect(*_):
+    raise dns.resolver.Timeout
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
-class TestNoRecordsOnTldTestCase(DNSValidatorTestCase):
+def test_working_mx_record_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_side_effect)
 
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('com', diagnose=True),
-            RFC5321Diagnosis('TLD'))
+    assert is_valid("example.com")
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NoAnswer)
-class TestNoRecordsOnNumericTldTestCase(DNSValidatorTestCase):
+def test_working_mx_record_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_side_effect)
 
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('iana.123'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('iana.123', diagnose=True),
-            RFC5321Diagnosis('TLDNUMERIC'))
+    assert is_valid("example.com", diagnose=True) == ValidDiagnosis()
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.NoNameservers)
-class NoNameserversRespondTestCase(DNSValidatorTestCase):
+def test_non_existant_mx_record_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", nx_domain_side_effect)
 
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('NO_NAMESERVERS'))
+    assert not is_valid("example.com")
 
 
-@patch('dns.resolver.query', side_effect=dns.resolver.Timeout)
-class DNSTimeoutTestCase(DNSValidatorTestCase):
+def test_non_existant_mx_record_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", nx_domain_side_effect)
 
-    def testWithoutDiagnosis(self, mocked_method):
-        self.assertEqual(self.is_valid('example.com'), False)
-
-    def testWithDiagnosis(self, mocked_method):
-        self.assertEqual(
-            self.is_valid('example.com', diagnose=True),
-            DNSDiagnosis('DNS_TIMEDOUT'))
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("NO_RECORD")
 
 
-if __name__ == '__main__':
-    unittest.run()
+def test_domain_too_long_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", too_long_side_effect)
+
+    assert not is_valid("example.com")
+
+
+def test_domain_too_long_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", too_long_side_effect)
+
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("NO_RECORD")
+
+
+def test_no_record_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", too_long_side_effect)
+
+    assert not is_valid("example.com")
+
+
+def test_no_record_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", too_long_side_effect)
+
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("NO_RECORD")
+
+
+def test_no_mx_on_tld_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", nx_domain_side_effect)
+
+    assert not is_valid("com")
+
+
+def test_no_mx_on_tld_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", nx_domain_side_effect)
+
+    assert is_valid("com", diagnose=True) == DNSDiagnosis("NO_RECORD")
+
+
+def test_no_records_on_tld_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_record_side_effect)
+
+    assert not is_valid("com")
+
+
+def test_no_records_on_tld_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_record_side_effect)
+
+    assert is_valid("com", diagnose=True) == RFC5321Diagnosis("TLD")
+
+
+def test_no_records_on_numeric_tld_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_record_side_effect)
+
+    assert not is_valid("iana.123")
+
+
+def test_no_records_on_numeric_tld_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_record_side_effect)
+
+    assert is_valid("iana.123", diagnose=True) == RFC5321Diagnosis("TLDNUMERIC")
+
+
+def test_no_nameservers_respond_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_ns_side_effect)
+
+    assert not is_valid("example.com")
+
+
+def test_no_nameservers_respond_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", no_ns_side_effect)
+
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("NO_NAMESERVERS")
+
+
+def test_dns_timeout_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", timeout_side_effect)
+
+    assert not is_valid("example.com")
+
+
+def test_dns_timeout_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "query", timeout_side_effect)
+
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("DNS_TIMEDOUT")

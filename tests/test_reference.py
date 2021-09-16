@@ -1,21 +1,20 @@
-import unittest
+import pytest
 from pyisemail import Reference
 
 
-class ReferenceTest(unittest.TestCase):
+def test_reference_repr():
+    r = Reference("local-part")
 
-    def test_repr(self):
-        r = Reference('local-part')
+    result = repr(r)
+    expected = "%s (%r)" % (r.__class__, r.__dict__)
 
-        result = repr(r)
-        expected = "%s (%r)" % (r.__class__, r.__dict__)
+    assert result == expected
 
-        self.assertEqual(result, expected)
 
-    def test_str(self):
-        r = Reference('local-part')
+def test_reference_str():
+    r = Reference("local-part")
 
-        result = str(r)
-        expected = "%s <%s>" % (r.citation, r.link)
+    result = str(r)
+    expected = "%s <%s>" % (r.citation, r.link)
 
-        self.assertEqual(result, expected)
+    assert result == expected
