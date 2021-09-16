@@ -12,14 +12,14 @@ class BaseDiagnosis(object):
     """
 
     CATEGORIES = {
-        'VALID': 1,
-        'DNSWARN': 7,
-        'RFC5321': 15,
-        'THRESHOLD': 16,
-        'CFWS': 31,
-        'DEPREC': 63,
-        'RFC5322': 127,
-        'ERR': 255,
+        "VALID": 1,
+        "DNSWARN": 7,
+        "RFC5321": 15,
+        "THRESHOLD": 16,
+        "CFWS": 31,
+        "DEPREC": 63,
+        "RFC5322": 127,
+        "ERR": 255,
     }
     DESCRIPTION = ""
     ERROR_CODES = {}

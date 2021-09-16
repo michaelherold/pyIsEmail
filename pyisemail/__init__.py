@@ -7,7 +7,7 @@ from pyisemail.validators import ParserValidator
 from pyisemail.version import VERSION
 
 __version__ = VERSION
-__all__ = ['is_email']
+__all__ = ["is_email"]
 
 
 def is_email(address, check_dns=False, diagnose=False, allow_gtld=True):

@@ -4,7 +4,6 @@ from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
 
 class DNSValidator(object):
-
     def is_valid(self, domain, diagnose=False):
 
         """Check whether a domain has a valid MX or A record.
@@ -37,31 +36,31 @@ class DNSValidator(object):
         # we will raise a warning because we didn't immediately find an MX
         # record.
         try:
-            dns.resolver.query(domain, 'MX')
+            dns.resolver.query(domain, "MX")
             dns_checked = True
         except (dns.resolver.NXDOMAIN, dns.name.NameTooLong):
             # Domain can't be found in DNS
-            return_status.append(DNSDiagnosis('NO_RECORD'))
+            return_status.append(DNSDiagnosis("NO_RECORD"))
 
             # Since dns.resolver gives more information than the PHP analog, we
             # can say that TLDs that throw an NXDOMAIN or NameTooLong error
             # have been checked
-            if len(domain.split('.')) == 1:
+            if len(domain.split(".")) == 1:
                 dns_checked = True
         except dns.resolver.NoAnswer:
             # MX-record for domain can't be found
-            return_status.append(DNSDiagnosis('NO_MX_RECORD'))
+            return_status.append(DNSDiagnosis("NO_MX_RECORD"))
 
             try:
                 # TODO: See if we can/need to narrow to A / CNAME
                 dns.resolver.query(domain)
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
-                return_status.append(DNSDiagnosis('NO_RECORD'))
+                return_status.append(DNSDiagnosis("NO_RECORD"))
         except dns.resolver.NoNameservers:
-            return_status.append(DNSDiagnosis('NO_NAMESERVERS'))
+            return_status.append(DNSDiagnosis("NO_NAMESERVERS"))
         except (dns.exception.Timeout, dns.resolver.Timeout):
-            return_status.append(DNSDiagnosis('DNS_TIMEDOUT'))
+            return_status.append(DNSDiagnosis("DNS_TIMEDOUT"))
 
         # Check for TLD addresses
         # -----------------------
@@ -98,11 +97,11 @@ class DNSValidator(object):
         if not dns_checked:
             atom_list = domain.split(".")
             if len(atom_list) == 1:
-                return_status.append(RFC5321Diagnosis('TLD'))
+                return_status.append(RFC5321Diagnosis("TLD"))
 
             try:
-                float(atom_list[len(atom_list)-1][0])
-                return_status.append(RFC5321Diagnosis('TLDNUMERIC'))
+                float(atom_list[len(atom_list) - 1][0])
+                return_status.append(RFC5321Diagnosis("TLDNUMERIC"))
             except ValueError:
                 pass
 
