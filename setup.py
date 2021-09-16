@@ -18,18 +18,6 @@ def get_version():
     raise RuntimeError('No version information found.')
 
 
-def tests_require():
-    requirements = [
-        "coverage",
-        "testtools >= 0.9.21",
-        "testscenarios >= 0.3"
-    ]
-
-    if sys.version_info[0] < 3:
-        requirements.append("mock >= 1.0.1")
-
-    return requirements
-
 setup(
     name="pyIsEmail",
     version=get_version(),
@@ -61,7 +49,7 @@ setup(
     install_requires=[
         "dnspython >= 1.15.0",
     ],
-    tests_require=tests_require(),
+    tests_require=["coverage", "pytest"],
     test_suite="tests",
     **kwargs
 )
