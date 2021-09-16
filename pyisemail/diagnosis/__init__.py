@@ -9,7 +9,12 @@ from pyisemail.diagnosis.rfc5322_diagnosis import RFC5322Diagnosis
 from pyisemail.diagnosis.valid_diagnosis import ValidDiagnosis
 
 __all__ = [
-    'BaseDiagnosis', 'CFWSDiagnosis', 'DeprecatedDiagnosis', 'DNSDiagnosis',
-    'InvalidDiagnosis', 'RFC5321Diagnosis', 'RFC5322Diagnosis',
-    'ValidDiagnosis',
+    "BaseDiagnosis",
+    "CFWSDiagnosis",
+    "DeprecatedDiagnosis",
+    "DNSDiagnosis",
+    "InvalidDiagnosis",
+    "RFC5321Diagnosis",
+    "RFC5322Diagnosis",
+    "ValidDiagnosis",
 ]
