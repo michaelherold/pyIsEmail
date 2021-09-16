@@ -1,3 +1,10 @@
+1.4.0 (2021-09-16)
+------------------
+
+- Allow limiting of email addresses on Generic Top-Level Domains (gTLDs) with the ``allow_gtld=False`` option [`bf13a6c`] - `@michaelherold`_.
+
+.. _bf13a6c: https://github.com/michaelherold/pyIsEmail/commit/bf13a6cfe662e66c8c6a5a9228d80cacf901b1ba
+
 1.3.2 (2018-07-05)
 ----------
 
