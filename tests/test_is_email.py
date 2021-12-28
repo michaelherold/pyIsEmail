@@ -1,13 +1,9 @@
-import pytest
-
 import dns.resolver
+import pytest
 from pyisemail import is_email
-from pyisemail.diagnosis import (
-    BaseDiagnosis,
-    DNSDiagnosis,
-    GTLDDiagnosis,
-    ValidDiagnosis,
-)
+from pyisemail.diagnosis import (BaseDiagnosis, DNSDiagnosis, GTLDDiagnosis,
+                                 ValidDiagnosis)
+
 from tests.validators import create_diagnosis, get_scenarios
 
 scenarios = get_scenarios("tests.xml")
@@ -45,7 +41,7 @@ def test_with_diagnosis(test_id, address, diagnosis):
 
 
 def test_dns_without_diagnosis(monkeypatch):
-    monkeypatch.setattr(dns.resolver, "query", side_effect)
+    monkeypatch.setattr(dns.resolver, "resolve", side_effect)
 
     result = is_email("test@example.com", check_dns=True)
     expected = False
@@ -54,7 +50,7 @@ def test_dns_without_diagnosis(monkeypatch):
 
 
 def test_dns_with_diagnosis(monkeypatch):
-    monkeypatch.setattr(dns.resolver, "query", side_effect)
+    monkeypatch.setattr(dns.resolver, "resolve", side_effect)
 
     result = is_email("test@example.com", check_dns=True, diagnose=True)
     expected = DNSDiagnosis("NO_RECORD")
