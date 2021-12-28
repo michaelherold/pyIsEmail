@@ -1,8 +1,13 @@
-import dns.resolver
 import pytest
+
+import dns.resolver
 from pyisemail import is_email
-from pyisemail.diagnosis import (BaseDiagnosis, DNSDiagnosis, GTLDDiagnosis,
-                                 ValidDiagnosis)
+from pyisemail.diagnosis import (
+    BaseDiagnosis,
+    DNSDiagnosis,
+    GTLDDiagnosis,
+    ValidDiagnosis,
+)
 
 from tests.validators import create_diagnosis, get_scenarios
 
