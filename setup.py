@@ -45,7 +45,7 @@ setup(
     exclude_package_data={"": [".gitignore"]},
     zip_safe=False,
     install_requires=[
-        "dnspython >= 1.15.0",
+        "dnspython >= 2.0.0",
     ],
     tests_require=["coverage", "pytest"],
     test_suite="tests",

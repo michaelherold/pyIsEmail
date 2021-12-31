@@ -1,5 +1,6 @@
 import dns.exception
 import dns.resolver
+from dns.rdatatype import MX
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
 
@@ -36,7 +37,7 @@ class DNSValidator(object):
         # we will raise a warning because we didn't immediately find an MX
         # record.
         try:
-            dns.resolver.query(domain, "MX")
+            dns.resolver.resolve(domain, MX)
             dns_checked = True
         except (dns.resolver.NXDOMAIN, dns.name.NameTooLong):
             # Domain can't be found in DNS
@@ -52,8 +53,7 @@ class DNSValidator(object):
             return_status.append(DNSDiagnosis("NO_MX_RECORD"))
 
             try:
-                # TODO: See if we can/need to narrow to A / CNAME
-                dns.resolver.query(domain)
+                dns.resolver.resolve(domain)
             except dns.resolver.NoAnswer:
                 # No usable records for the domain can be found
                 return_status.append(DNSDiagnosis("NO_RECORD"))
