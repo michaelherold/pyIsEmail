@@ -12,6 +12,7 @@ class DNSDiagnosis(BaseDiagnosis):
         "DNS_TIMEDOUT": 4,
         "NO_MX_RECORD": 5,
         "NO_RECORD": 6,
+        "NULL_MX_RECORD": 7,
     }
 
     MESSAGES = {
@@ -21,4 +22,5 @@ class DNSDiagnosis(BaseDiagnosis):
             "Couldn't find an MX record for this domain " "but an A record does exist."
         ),
         "NO_RECORD": "Couldn't find an MX record or A record for this domain.",
+        "NULL_MX_RECORD": "Domain does not support email service.",
     }

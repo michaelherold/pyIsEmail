@@ -37,8 +37,16 @@ class DNSValidator(object):
         # we will raise a warning because we didn't immediately find an MX
         # record.
         try:
-            dns.resolver.resolve(domain, MX)
+            records = dns.resolver.resolve(domain, MX)
             dns_checked = True
+
+            # Even if there's an MX record set we need to verify the preference
+            # value and label length. If it's a single MX record with a
+            # preference of 0 and an empty label it should return null MX.
+            # https://www.rfc-editor.org/rfc/rfc7505.html#section-3
+            if len(records) == 1:
+                if records[0].preference == 0 and len(records[0].exchange) <= 1:
+                    return_status.append(DNSDiagnosis("NULL_MX_RECORD"))
         except (dns.resolver.NXDOMAIN, dns.name.NameTooLong):
             # Domain can't be found in DNS
             return_status.append(DNSDiagnosis("NO_RECORD"))
