@@ -14,11 +14,6 @@ from pyisemail.diagnosis import (
 
 __all__ = ["create_diagnosis", "get_scenarios"]
 
-if sys.version_info[0] == 3:
-    _unicode = str
-elif sys.version_info[0] == 2:
-    _unicode = unicode
-
 
 def create_diagnosis(tag):
 
@@ -79,7 +74,7 @@ def _get_node_text(text):
     """
 
     if text:
-        return _unicode(text)
+        return str(text)
     else:
         return ""
 

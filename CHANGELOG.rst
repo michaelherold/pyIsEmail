@@ -1,7 +1,20 @@
+2.0.0 (2022-10-17)
+------------------
+
+- **Breaking (Python 2):** Upgrade to the new ``dnspython`` resolve API for DNS checks for future-proofing [`229db4f`_] - `@moshfrid`_.
+- **Breaking (Python 2):** Drop support for Python versions prior to 3.6 [`635aff4`_] - `@michaelherold`_.
+- Consider emails with domains that have null MX records, per RFC7505, invalid when checking DNS [`ebc4a2f`] - `@bmcculley`_.
+
+.. _229db4f: https://github.com/michaelherold/pyIsEmail/commit/229db4fe4f790b5a95e1e85bffbdd42464472ea5
+.. _635aff4: https://github.com/michaelherold/pyIsEmail/commit/635aff42c3cd0a04f3bad8c79099cd5827fed74f
+.. _ebc4a2f: https://github.com/michaelherold/pyIsEmail/commit/ebc4a2f8120b02d488472c1f5bf293b155b58118
+.. _@moshfrid: https://github.com/moshfrid
+.. _@bmcculley: https://github.com/bmcculley
+
 1.4.0 (2021-09-16)
 ------------------
 
-- Allow limiting of email addresses on Generic Top-Level Domains (gTLDs) with the ``allow_gtld=False`` option [`bf13a6c`] - `@michaelherold`_.
+- Allow limiting of email addresses on Generic Top-Level Domains (gTLDs) with the ``allow_gtld=False`` option [`bf13a6c`_] - `@michaelherold`_.
 
 .. _bf13a6c: https://github.com/michaelherold/pyIsEmail/commit/bf13a6cfe662e66c8c6a5a9228d80cacf901b1ba
 
