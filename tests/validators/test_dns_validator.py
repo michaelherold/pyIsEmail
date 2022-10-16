@@ -1,3 +1,4 @@
+import time
 import dns.name
 import dns.resolver
 import pytest
@@ -6,9 +7,55 @@ from pyisemail.validators import DNSValidator
 
 is_valid = DNSValidator().is_valid
 
+message_text_null_mx = """id 1234
+opcode QUERY
+rcode NOERROR
+flags QR AA RD
+;QUESTION
+example.com. IN MX
+;ANSWER
+example.com. 86400   IN  MX  0 .
+;AUTHORITY
+;ADDITIONAL
+"""
+
+message_text_zero_preference = """id 1234
+opcode QUERY
+rcode NOERROR
+flags QR AA RD
+;QUESTION
+example.com. IN MX
+;ANSWER
+example.com. 86400   IN  MX  0 mail.example.com.
+;AUTHORITY
+;ADDITIONAL
+"""
+
+
+class FakeAnswer(object):
+    def __init__(self, expiration):
+        self.expiration = expiration
+
+    def __len__(self):
+        return 2
+
+
+def null_mx_record(*_):
+    message = dns.message.from_text(message_text_null_mx)
+    name = dns.name.from_text("example.com.")
+
+    return dns.resolver.Answer(name, dns.rdatatype.MX, dns.rdataclass.IN, message)
+
+
+def zero_preference_mx_record(*_):
+    message = dns.message.from_text(message_text_zero_preference)
+    name = dns.name.from_text("example.com.")
+
+    return dns.resolver.Answer(name, dns.rdatatype.MX, dns.rdataclass.IN, message)
+
 
 def no_side_effect(*_):
-    return True
+    return FakeAnswer(time.time() + 1)
 
 
 def nx_domain_side_effect(*_):
@@ -137,3 +184,27 @@ def test_dns_timeout_with_diagnosis(monkeypatch):
     monkeypatch.setattr(dns.resolver, "resolve", timeout_side_effect)
 
     assert is_valid("example.com", diagnose=True) == DNSDiagnosis("DNS_TIMEDOUT")
+
+
+def test_null_mx_record_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "resolve", null_mx_record)
+
+    assert not is_valid("example.com")
+
+
+def test_null_mx_record_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "resolve", null_mx_record)
+
+    assert is_valid("example.com", diagnose=True) == DNSDiagnosis("NULL_MX_RECORD")
+
+
+def test_zero_preference_mx_record_without_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "resolve", zero_preference_mx_record)
+
+    assert is_valid("example.com")
+
+
+def test_zero_preference_mx_record_with_diagnosis(monkeypatch):
+    monkeypatch.setattr(dns.resolver, "resolve", zero_preference_mx_record)
+
+    assert is_valid("example.com", diagnose=True) == ValidDiagnosis()
