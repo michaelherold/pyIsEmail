@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyIsEmail"
+dynamic = ["version"]
+description = "Simple, robust email validation"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    { name = "Michael Herold", email = "opensource@michaeljherold.com" },
+]
+keywords = [
+    "email",
+    "validation",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Communications :: Email",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "dnspython >= 2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/michaelherold/pyIsEmail"
+Source = "https://github.com/michaelherold/pyIsEmail"
+Tracker = "https://github.com/michaelherold/pyIsEmail/issues"
+
+[tool.black]
+include = '\.pyi?$'
+skip-string-normalization = true
+target-version = ["py37"]
+
+[tool.coverage.report]
+omit = ["*test*"]
+
+[tool.coverage.run]
+source = ["pyisemail"]
+
+[tool.hatch.version]
+path = "pyisemail/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/pyisemail",
+]
+
+[tool.hatch.build.targets.wheel]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "coverage[toml]>=6.2",
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=html:coverage --cov-config=pyproject.toml --cov=pyisemail --cov=tests {args}"
+test = "pytest {args}"
+
+[tool.hatch.envs.ci]
+dependencies = [
+    "coverage[toml]>=6.2",
+    "coveralls",
+]
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = [
+    "black==22.10.0",
+]
+
+[tool.hatch.envs.lint.scripts]
+all = [
+    "fmt",
+]
+fmt = [
+    "black --quiet {args:.}",
+    "style",
+]
+lint = [
+     "style",
+]
+style = [
+    "black --quiet --check --diff {args:.}",
+]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["37", "38", "39", "310"]

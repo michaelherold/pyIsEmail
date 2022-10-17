@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -euo pipefail
+
+if ! command -v hatch >/dev/null; then
+    cat <<MSG >&2
+Whoops! You need to install Hatch first.
+
+Install it with your package manager or pipx, then try again:
+https://hatch.pypa.io/1.6/install/
+MSG
+fi
+
+hatch env create
+hatch env create lint
