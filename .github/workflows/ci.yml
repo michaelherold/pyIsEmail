@@ -22,7 +22,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          hatch run lint:all
+          script/static-analysis
 
   test:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
 
       - name: Run tests
         run: |
-          hatch run cov
+          script/test
 
       - name: Report coverage
         env:
