@@ -1,6 +1,7 @@
 import dns.exception
 import dns.resolver
 from dns.rdatatype import MX
+
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 
 

@@ -1,10 +1,16 @@
 import re
 import sys
+
 from pyisemail import EmailValidator
-from pyisemail.diagnosis import BaseDiagnosis, CFWSDiagnosis
-from pyisemail.diagnosis import DeprecatedDiagnosis
-from pyisemail.diagnosis import InvalidDiagnosis, RFC5321Diagnosis
-from pyisemail.diagnosis import RFC5322Diagnosis, ValidDiagnosis
+from pyisemail.diagnosis import (
+    BaseDiagnosis,
+    CFWSDiagnosis,
+    DeprecatedDiagnosis,
+    InvalidDiagnosis,
+    RFC5321Diagnosis,
+    RFC5322Diagnosis,
+    ValidDiagnosis,
+)
 from pyisemail.utils import enum
 
 __all__ = ["ParserValidator"]
