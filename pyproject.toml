@@ -68,6 +68,8 @@ path = "pyisemail/__about__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
+    "/CHANGELOG.rst",
+    "/CONTRIBUTING.rst",
     "/pyisemail",
 ]
 
