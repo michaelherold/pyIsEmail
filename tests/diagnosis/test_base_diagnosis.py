@@ -1,4 +1,5 @@
 import pytest
+
 from pyisemail.diagnosis import BaseDiagnosis
 
 

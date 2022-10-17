@@ -1,4 +1,5 @@
 import pytest
+
 from pyisemail.diagnosis import BaseDiagnosis
 from pyisemail.validators import ParserValidator
 from tests.validators import create_diagnosis, get_scenarios

@@ -39,6 +39,11 @@ Homepage = "https://github.com/michaelherold/pyIsEmail"
 Source = "https://github.com/michaelherold/pyIsEmail"
 Tracker = "https://github.com/michaelherold/pyIsEmail/issues"
 
+[tool.bandit]
+recursive = true
+exclude_dirs = ["tests"]
+skips = ["B105"]
+
 [tool.black]
 include = '\.pyi?$'
 skip-string-normalization = true
@@ -49,6 +54,14 @@ omit = ["*test*"]
 
 [tool.coverage.run]
 source = ["pyisemail"]
+
+[tool.isort]
+default_section = "THIRDPARTY"
+force_grid_wrap = 0
+include_trailing_comma = true
+known_first_party = ["hatch", "hatchling"]
+multi_line_output = 3
+use_parentheses = true
 
 [tool.hatch.version]
 path = "pyisemail/__about__.py"
@@ -80,22 +93,29 @@ dependencies = [
 [tool.hatch.envs.lint]
 detached = true
 dependencies = [
+    "bandit[toml]==1.7.4",
     "black==22.10.0",
+    "isort==5.10.1",
 ]
 
 [tool.hatch.envs.lint.scripts]
 all = [
     "fmt",
+    "security",
 ]
 fmt = [
     "black --quiet {args:.}",
+    "isort --quiet {args:.}",
     "style",
 ]
 lint = [
-     "style",
+    "security",
+    "style",
 ]
+security = "bandit --configfile pyproject.toml --quiet --recursive {args:.}"
 style = [
     "black --quiet --check --diff {args:.}",
+    "isort --quiet --check-only --diff {args:.}"
 ]
 
 [[tool.hatch.envs.test.matrix]]

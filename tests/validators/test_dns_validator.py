@@ -1,7 +1,9 @@
 import time
+
 import dns.name
 import dns.resolver
 import pytest
+
 from pyisemail.diagnosis import DNSDiagnosis, RFC5321Diagnosis, ValidDiagnosis
 from pyisemail.validators import DNSValidator
 

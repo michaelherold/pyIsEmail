@@ -1,10 +1,16 @@
 import os
 import sys
 import xml.etree.ElementTree as ET
-from pyisemail.diagnosis import CFWSDiagnosis, DeprecatedDiagnosis
-from pyisemail.diagnosis import DNSDiagnosis, InvalidDiagnosis
-from pyisemail.diagnosis import RFC5321Diagnosis, RFC5322Diagnosis
-from pyisemail.diagnosis import ValidDiagnosis
+
+from pyisemail.diagnosis import (
+    CFWSDiagnosis,
+    DeprecatedDiagnosis,
+    DNSDiagnosis,
+    InvalidDiagnosis,
+    RFC5321Diagnosis,
+    RFC5322Diagnosis,
+    ValidDiagnosis,
+)
 
 __all__ = ["create_diagnosis", "get_scenarios"]
 

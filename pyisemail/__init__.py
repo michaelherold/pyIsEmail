@@ -2,9 +2,7 @@ from pyisemail.__about__ import __version__
 from pyisemail.diagnosis import BaseDiagnosis
 from pyisemail.email_validator import EmailValidator
 from pyisemail.reference import Reference
-from pyisemail.validators import DNSValidator
-from pyisemail.validators import GTLDValidator
-from pyisemail.validators import ParserValidator
+from pyisemail.validators import DNSValidator, GTLDValidator, ParserValidator
 
 __all__ = ["is_email"]
 
