@@ -26,3 +26,4 @@ htmlcov
 
 .idea
 .pypirc
+smoke_test/
