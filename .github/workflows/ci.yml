@@ -58,3 +58,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           hatch run ci:coveralls --service=github
+
+  smoke_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          pipx install hatch==1.6.*
+          hatch env create
+
+      - name: Ensure built wheel works properly
+        run: |
+          script/smoke-test

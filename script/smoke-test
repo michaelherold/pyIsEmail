@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -euo pipefail
+
+msg() {
+    echo "==> $1"
+}
+
+msg "Cleaning"
+[ -d dist/ ] && rm -rf dist/
+
+msg "Building"
+hatch build -c
+
+msg "Diagnostics"
+hatch run wheel2json dist/*.whl
+
+msg "Creating virtualenv"
+python -m venv smoke_test
+source smoke_test/bin/activate
+
+msg "Installing"
+pip install dist/*.whl
+
+msg "Testing"
+python -c 'from pyisemail import is_email; is_email("test@example.com")'
+
+msg "Cleaning up"
+deactivate
+rm -rf smoke_test/

@@ -81,6 +81,7 @@ dependencies = [
     "coverage[toml]>=6.2",
     "pytest",
     "pytest-cov",
+    "wheel-inspect",
 ]
 
 [tool.hatch.envs.default.scripts]
