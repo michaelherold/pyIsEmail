@@ -15,16 +15,22 @@ hatch build -c
 msg "Diagnostics"
 hatch run wheel2json dist/*.whl
 
+msg "Change into temporary directory"
+REPO_DIR="$PWD"
+CLEAN_ROOM="$(mktemp -d)"
+cd "$CLEAN_ROOM"
+
 msg "Creating virtualenv"
 python -m venv smoke_test
 source smoke_test/bin/activate
 
 msg "Installing"
-pip install dist/*.whl
+pip install $REPO_DIR/dist/*.whl
 
 msg "Testing"
 python -c 'from pyisemail import is_email; is_email("test@example.com")'
 
 msg "Cleaning up"
 deactivate
-rm -rf smoke_test/
+cd "$REPO_DIR"
+rm -rf "$CLEAN_ROOM"
