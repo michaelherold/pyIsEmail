@@ -51,7 +51,7 @@ jobs:
 
       - name: Run tests
         run: |
-          script/test
+          script/test ci
 
       - name: Report coverage
         env:

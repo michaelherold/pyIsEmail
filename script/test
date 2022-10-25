@@ -2,4 +2,8 @@
 
 set -euo pipefail
 
-hatch run cov
+HATCH_ENV="${1:-test}"
+
+hatch build -c
+hatch run $HATCH_ENV:pip install --force-reinstall --quiet dist/*.whl
+hatch run $HATCH_ENV:cov

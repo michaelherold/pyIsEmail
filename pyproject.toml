@@ -54,7 +54,7 @@ target-version = ["py37"]
 omit = ["*test*"]
 
 [tool.coverage.run]
-source = ["pyisemail"]
+source = ["src/pyisemail"]
 
 [tool.isort]
 default_section = "THIRDPARTY"
@@ -65,16 +65,17 @@ multi_line_output = 3
 use_parentheses = true
 
 [tool.hatch.version]
-path = "pyisemail/__about__.py"
+path = "src/pyisemail/__about__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/CHANGELOG.rst",
     "/CONTRIBUTING.rst",
-    "/pyisemail",
+    "/src/pyisemail",
 ]
 
 [tool.hatch.build.targets.wheel]
+packages = ["src/pyisemail"]
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -85,13 +86,15 @@ dependencies = [
 ]
 
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-report=html:coverage --cov-config=pyproject.toml --cov=pyisemail --cov=tests {args}"
-test = "pytest {args}"
+cov = "python -m pytest --cov-report=html:coverage --cov-config=pyproject.toml --cov=src/pyisemail --cov=tests {args}"
+test = "cov --no-cov {args}"
 
 [tool.hatch.envs.ci]
 dependencies = [
     "coverage[toml]>=6.2",
     "coveralls",
+    "pytest",
+    "pytest-cov",
 ]
 
 [tool.hatch.envs.lint]
