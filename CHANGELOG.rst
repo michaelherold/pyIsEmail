@@ -1,5 +1,12 @@
-2.0.0 (2022-10-17)
+2.0.1 (2022-10-24)
 ------------------
+
+- Fix the packaging to use the correct package name so that the wheel works as expected [`d36f22e`_] - `@michaelherold`_.
+
+.. _d36f22e: https://github.com/michaelherold/pyIsEmail/commit/d36f22eac615f29ffa62fe13161244c5e1f7e906
+
+2.0.0 (2022-10-17) **YANKED**
+-----------------------------
 
 - **Breaking (Python 2):** Upgrade to the new ``dnspython`` resolve API for DNS checks for future-proofing [`229db4f`_] - `@moshfrid`_.
 - **Breaking (Python 2):** Drop support for Python versions prior to 3.6 [`635aff4`_] - `@michaelherold`_.
@@ -19,7 +26,7 @@
 .. _bf13a6c: https://github.com/michaelherold/pyIsEmail/commit/bf13a6cfe662e66c8c6a5a9228d80cacf901b1ba
 
 1.3.2 (2018-07-05)
-----------
+------------------
 
 - Upgrade to universal dnspython version - `@peterdemin`_.
 
